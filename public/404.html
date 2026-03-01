@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>EasyCare</title>
+    <script>
+      // Single Page App redirect for GitHub Pages
+      // Converts the path into a query string so index.html can restore it.
+      // Since we use HashRouter, most navigation already works, but this
+      // handles the edge case where someone lands on a non-root path directly.
+      var pathSegmentsToKeep = 1; // Keep '/Easecareweb' repo segment
+      var l = window.location;
+      l.replace(
+        l.protocol + '//' + l.hostname + (l.port ? ':' + l.port : '') +
+        l.pathname.split('/').slice(0, 1 + pathSegmentsToKeep).join('/') + '/?/' +
+        l.pathname.slice(1).split('/').slice(pathSegmentsToKeep).join('/').replace(/&/g, '~and~') +
+        (l.search ? '&' + l.search.slice(1).replace(/&/g, '~and~') : '') +
+        l.hash
+      );
+    </script>
+  </head>
+  <body>
+  </body>
+</html>

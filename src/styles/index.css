@@ -1,0 +1,24 @@
+@import './fonts.css';
+@import './tailwind.css';
+@import './theme.css';
+
+/* Shine border animation */
+@property --angle {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
+@keyframes shine {
+  from { --angle: 0deg; }
+  to { --angle: 360deg; }
+}
+
+/* Rainbow button border animation */
+@property --rainbow-angle {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
+@keyframes rainbow-rotate {
+  to { --rainbow-angle: 360deg; }
+}
