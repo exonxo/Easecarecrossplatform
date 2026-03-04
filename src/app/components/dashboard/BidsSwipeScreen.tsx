@@ -276,7 +276,7 @@ export function BidsSwipeScreen() {
   return (
     <div className="fixed inset-0 z-50 bg-gradient-to-b from-[#0a0f1e] to-[#0d1529] flex flex-col">
       {/* Header */}
-      <div className="shrink-0 px-5 pt-4 pb-3 flex items-center justify-between">
+      <div className="shrink-0 px-5 pt-4 pb-3 flex items-center justify-between" style={{ paddingTop: 'calc(env(safe-area-inset-top, 16px) + 0.75rem)' }}>
         <button
           onClick={() => navigate("/bookings")}
           className="size-10 flex items-center justify-center rounded-full hover:bg-white/10 transition-colors cursor-pointer"

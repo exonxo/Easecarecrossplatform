@@ -170,40 +170,23 @@ export function HeroBanner() {
         </button>
 
         {/* ── Desktop dots inside banner ── */}
-        <div className="hidden md:flex absolute bottom-5 left-1/2 -translate-x-1/2 gap-2 z-10">
-          {slides.map((_, i) => (
-            <button
-              key={i}
-              onClick={() => {
-                setDirection(i > current ? 1 : -1);
-                setCurrent(i);
-              }}
-              className={`rounded-full transition-all duration-300 cursor-pointer ${
-                i === current
-                  ? "bg-white w-5 h-[3px]"
-                  : "bg-white/40 size-[3px] hover:bg-white/60"
-              }`}
-            />
-          ))}
-        </div>
+        
       </div>
 
-      {/* ── Mobile dots below banner ── */}
-      <div className="flex md:hidden gap-1.5 items-center justify-center">
-        {slides.map((_, i) => (
-          <button
-            key={i}
-            onClick={() => {
-              setDirection(i > current ? 1 : -1);
-              setCurrent(i);
-            }}
-            className={`rounded-full transition-all duration-300 cursor-pointer ${
-              i === current
-                ? "bg-[#0f172a] w-4 h-[3px]"
-                : "bg-[#d1d5db] w-[3px] h-[3px]"
-            }`}
-          />
-        ))}
+      {/* ── Mobile chevron nav below banner ── */}
+      <div className="flex md:hidden gap-4 items-center justify-center">
+        <button
+          onClick={prev}
+          className="size-8 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 active:scale-95 transition-all cursor-pointer"
+        >
+          <ChevronLeft size={18} className="text-gray-700" />
+        </button>
+        <button
+          onClick={next}
+          className="size-8 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 active:scale-95 transition-all cursor-pointer"
+        >
+          <ChevronRight size={18} className="text-gray-700" />
+        </button>
       </div>
     </div>
   );

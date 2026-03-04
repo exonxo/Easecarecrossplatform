@@ -15,7 +15,7 @@ export function HomePage() {
   return (
     <PullToRefresh>
       <main className="flex-1 pb-[100px] md:pb-0">
-        <div className="w-full min-w-0 max-w-[1180px] mx-auto px-4 md:px-8 pt-4 md:pt-7 pb-4 flex flex-col gap-6 md:gap-8 overflow-hidden box-border bg-white">
+        <div className="w-full min-w-0 max-w-[1180px] mx-auto px-4 md:px-8 pt-4 md:pt-7 pb-4 flex flex-col gap-6 md:gap-8 overflow-hidden box-border bg-white mx-[0px] mt-[0px] mb-[80px]">
           <HeroSection />
           <TrustBar />
           <QuickCategories />
@@ -26,9 +26,7 @@ export function HomePage() {
         <div className="md:max-w-[1180px] md:mx-auto md:px-8">
           <CommunitySection />
         </div>
-        <div className="max-w-[1180px] mx-auto px-4 md:px-8 pt-6 md:pt-8 pb-4 flex flex-col gap-6 md:gap-8">
-          <div className="h-2 md:h-4" />
-        </div>
+        
       </main>
     </PullToRefresh>
   );
