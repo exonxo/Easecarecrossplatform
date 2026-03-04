@@ -180,8 +180,8 @@ export function HeroBanner() {
               }}
               className={`rounded-full transition-all duration-300 cursor-pointer ${
                 i === current
-                  ? "bg-white w-7 h-[5px]"
-                  : "bg-white/40 size-[5px] hover:bg-white/60"
+                  ? "bg-white w-5 h-[3px]"
+                  : "bg-white/40 size-[3px] hover:bg-white/60"
               }`}
             />
           ))}
@@ -189,7 +189,7 @@ export function HeroBanner() {
       </div>
 
       {/* ── Mobile dots below banner ── */}
-      <div className="flex md:hidden gap-2 items-center justify-center">
+      <div className="flex md:hidden gap-1.5 items-center justify-center">
         {slides.map((_, i) => (
           <button
             key={i}
@@ -199,8 +199,8 @@ export function HeroBanner() {
             }}
             className={`rounded-full transition-all duration-300 cursor-pointer ${
               i === current
-                ? "bg-[#0f172a] w-6 h-[5px]"
-                : "bg-[#d1d5db] size-[5px]"
+                ? "bg-[#0f172a] w-4 h-[3px]"
+                : "bg-[#d1d5db] w-[3px] h-[3px]"
             }`}
           />
         ))}

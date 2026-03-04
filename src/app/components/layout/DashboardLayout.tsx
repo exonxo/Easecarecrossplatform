@@ -1,16 +1,16 @@
 /**
  * DashboardLayout - Root layout for all authenticated dashboard pages.
- * Structure: Sidebar (desktop) + TopHeader (desktop) + MobileHeader + <Outlet> + BottomNav (mobile)
+ * Structure: Sidebar (desktop) + TopHeader (desktop) + MobileHeader + AnimatedOutlet + BottomNav (mobile)
  * Also renders the LiveServiceAlert snackbar across all tabs.
  * Uses SmoothCursor for a custom desktop cursor effect.
  */
-import { Outlet } from "react-router";
 import { Sidebar } from "./Sidebar";
 import { TopHeader } from "./TopHeader";
 import { MobileHeader } from "./MobileHeader";
 import { BottomNav } from "./BottomNav";
 import { LiveServiceAlert } from "../booking/LiveServiceAlert";
 import { SmoothCursor } from "../ui/smooth-cursor";
+import { AnimatedOutlet } from "./AnimatedOutlet";
 
 export function DashboardLayout() {
   return (
@@ -30,8 +30,8 @@ export function DashboardLayout() {
           <TopHeader />
         </div>
 
-        {/* Page content */}
-        <Outlet />
+        {/* Page content — animated fade between routes */}
+        <AnimatedOutlet />
       </div>
 
       {/* Bottom Nav - mobile only */}

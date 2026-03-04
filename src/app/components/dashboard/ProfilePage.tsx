@@ -107,8 +107,21 @@ function EditProfileModal({
   const [location, setLocation] = useState(user.location);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-      <div className="bg-white rounded-[20px] w-full max-w-[480px] max-h-[90vh] overflow-y-auto shadow-2xl">
+    <motion.div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.22, ease: [0.4, 0, 0.2, 1] }}
+    >
+      <motion.div
+        className="bg-white rounded-[20px] w-full max-w-[480px] max-h-[90vh] overflow-y-auto shadow-2xl"
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        exit={{ opacity: 0, scale: 0.95 }}
+        transition={{ duration: 0.22, ease: [0.4, 0, 0.2, 1] }}
+        style={{ willChange: "transform, opacity" }}
+      >
         {/* Header */}
         <div className="flex items-center justify-between p-5 border-b border-gray-100">
           <h3 className="font-['Inter',sans-serif] font-semibold text-[18px] text-[#111827]">
@@ -218,8 +231,8 @@ function EditProfileModal({
             Save Changes
           </button>
         </div>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 }
 
@@ -498,9 +511,11 @@ export function ProfilePage() {
       </main>
 
       {/* Edit Profile Modal */}
-      {showEdit && (
-        <EditProfileModal user={user} onClose={() => setShowEdit(false)} onSave={handleSave} />
-      )}
+      <AnimatePresence>
+        {showEdit && (
+          <EditProfileModal user={user} onClose={() => setShowEdit(false)} onSave={handleSave} />
+        )}
+      </AnimatePresence>
 
       {/* Sign Out Confirmation Modal */}
       <AnimatePresence>
@@ -510,8 +525,16 @@ export function ProfilePage() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
+            transition={{ duration: 0.22, ease: [0.4, 0, 0.2, 1] }}
           >
-            <div className="bg-white rounded-[20px] w-full max-w-[480px] max-h-[90vh] overflow-y-auto shadow-2xl">
+            <motion.div
+              className="bg-white rounded-[20px] w-full max-w-[480px] max-h-[90vh] overflow-y-auto shadow-2xl"
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              transition={{ duration: 0.22, ease: [0.4, 0, 0.2, 1] }}
+              style={{ willChange: "transform, opacity" }}
+            >
               {/* Header */}
               <div className="flex items-center justify-between p-5 border-b border-gray-100">
                 <h3 className="font-['Inter',sans-serif] font-semibold text-[18px] text-[#111827]">
@@ -549,7 +572,7 @@ export function ProfilePage() {
                   </button>
                 </div>
               </div>
-            </div>
+            </motion.div>
           </motion.div>
         )}
       </AnimatePresence>

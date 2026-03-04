@@ -22,6 +22,7 @@ import { RequireAuth, RedirectIfAuth } from "./components/auth/AuthGuard";
 
 // Layout — loaded eagerly (always needed)
 import { DashboardLayout } from "./components/layout/DashboardLayout";
+import { PageTransition } from "./components/layout/PageTransition";
 
 // Page components — eagerly imported to avoid "Failed to fetch dynamically
 // imported module" errors in the Figma Make proxy environment.  The app is
@@ -113,7 +114,9 @@ export const router = createHashRouter([
     path: "/onboarding",
     element: (
       <RedirectIfAuth>
-        <OnboardingFlow />
+        <PageTransition>
+          <OnboardingFlow />
+        </PageTransition>
       </RedirectIfAuth>
     ),
   },
@@ -121,7 +124,9 @@ export const router = createHashRouter([
     path: "/post-requirement",
     element: (
       <RequireAuth>
-        <PostRequirementFlow />
+        <PageTransition>
+          <PostRequirementFlow />
+        </PageTransition>
       </RequireAuth>
     ),
   },
@@ -129,7 +134,9 @@ export const router = createHashRouter([
     path: "/services",
     element: (
       <RequireAuth>
-        <Services />
+        <PageTransition>
+          <Services />
+        </PageTransition>
       </RequireAuth>
     ),
   },
@@ -137,7 +144,9 @@ export const router = createHashRouter([
     path: "/add-location",
     element: (
       <RequireAuth>
-        <AddLocation />
+        <PageTransition>
+          <AddLocation />
+        </PageTransition>
       </RequireAuth>
     ),
   },
@@ -145,7 +154,9 @@ export const router = createHashRouter([
     path: "/bookings/:id/bids",
     element: (
       <RequireAuth>
-        <BidCards />
+        <PageTransition>
+          <BidCards />
+        </PageTransition>
       </RequireAuth>
     ),
   },

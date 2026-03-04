@@ -334,32 +334,54 @@ export function BookingCheckout({
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 40 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: 40 }}
-      transition={{ type: "spring", damping: 28, stiffness: 280 }}
-      className="fixed inset-0 z-[70] bg-[#f6f8fc] flex flex-col"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.28, ease: [0.4, 0, 0.2, 1] }}
+      className="fixed inset-0 z-[70] flex items-end md:items-center justify-center"
     >
-      {/* ── Header ── */}
-      <div className="shrink-0 bg-white px-4 pt-4 pb-3 flex items-center gap-3 shadow-[0px_1px_3px_rgba(0,0,0,0.06)]">
-        <button
-          onClick={onClose}
-          className="size-10 rounded-full bg-[#f3f4f6] flex items-center justify-center cursor-pointer hover:bg-[#e5e7eb] transition-colors active:scale-[0.95]"
-        >
-          <ChevronLeft size={20} className="text-[#374151]" />
-        </button>
-        <div className="flex-1">
-          <h1 className="font-['Lexend',sans-serif] font-bold text-[18px] text-[#111827]">
-            Booking Summary
-          </h1>
-          <p className="font-['Inter',sans-serif] text-[12px] text-[#9ca3af]">
-            Review details before confirming
-          </p>
-        </div>
-      </div>
+      {/* Backdrop */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        className="absolute inset-0 bg-black/50 backdrop-blur-[2px]"
+        onClick={onClose}
+      />
 
-      {/* ── Scrollable Body ── */}
-      <div className="flex-1 overflow-y-auto no-scrollbar pb-[110px]">
+      {/* Popup */}
+      <motion.div
+        initial={{ y: "100%" }}
+        animate={{ y: 0 }}
+        exit={{ y: "100%" }}
+        transition={{ type: "spring", damping: 30, stiffness: 320 }}
+        className="relative w-full max-w-[420px] bg-[#f6f8fc] rounded-t-[24px] md:rounded-[24px] flex flex-col max-h-[92vh] md:max-h-[85vh]"
+      >
+        {/* Handle (mobile) */}
+        <div className="flex justify-center pt-3 pb-1 md:hidden">
+          <div className="w-[40px] h-[4px] rounded-full bg-[#d0d5dd]" />
+        </div>
+
+        {/* ── Header ── */}
+        <div className="shrink-0 bg-white rounded-t-[24px] px-5 pt-2 pb-3 flex items-center justify-between border-b border-[#f3f4f6]">
+          <div>
+            <h1 className="font-['Lexend',sans-serif] font-bold text-[18px] text-[#111827]">
+              Booking Summary
+            </h1>
+            <p className="font-['Inter',sans-serif] text-[12px] text-[#9ca3af]">
+              Review details before confirming
+            </p>
+          </div>
+          <button
+            onClick={onClose}
+            className="size-8 rounded-full bg-[#f3f4f6] flex items-center justify-center cursor-pointer hover:bg-[#e5e7eb] transition-colors active:scale-[0.95]"
+          >
+            <X size={16} className="text-[#6b7280]" />
+          </button>
+        </div>
+
+        {/* ── Scrollable Body ── */}
+        <div className="flex-1 overflow-y-auto no-scrollbar pb-4">
         {/* Savings banner */}
         {totalSavings > 0 && (
           <div className="mx-4 mt-4 bg-gradient-to-r from-[#ecfdf5] to-[#d1fae5] rounded-[14px] px-4 py-3 flex items-center gap-2.5">
@@ -798,8 +820,8 @@ export function BookingCheckout({
         </div>
       </div>
 
-      {/* ── Sticky CTA ── */}
-      <div className="absolute bottom-0 left-0 right-0 bg-white border-t border-[#f3f4f6] px-5 pt-3 pb-[max(16px,env(safe-area-inset-bottom))] shadow-[0px_-4px_20px_rgba(0,0,0,0.06)]">
+        {/* ── Sticky CTA ── */}
+        <div className="shrink-0 bg-white border-t border-[#f3f4f6] px-5 pt-3 pb-[max(16px,env(safe-area-inset-bottom))] shadow-[0px_-4px_20px_rgba(0,0,0,0.06)] rounded-b-none md:rounded-b-[24px]">
         <div className="flex items-center justify-between mb-3">
           <div>
             <p className="font-['Inter',sans-serif] text-[11px] text-[#9ca3af]">
@@ -820,18 +842,19 @@ export function BookingCheckout({
         <PrimaryButton onClick={onProceedToPay}>
           Proceed to Pay
         </PrimaryButton>
-      </div>
+        </div>
 
-      {/* ── Coupon Sheet ── */}
-      <AnimatePresence>
-        {showCoupons && (
-          <CouponSheet
-            onApply={handleApplyCoupon}
-            onClose={() => setShowCoupons(false)}
-            appliedCode={appliedCoupon?.code || null}
-          />
-        )}
-      </AnimatePresence>
+        {/* ── Coupon Sheet ── */}
+        <AnimatePresence>
+          {showCoupons && (
+            <CouponSheet
+              onApply={handleApplyCoupon}
+              onClose={() => setShowCoupons(false)}
+              appliedCode={appliedCoupon?.code || null}
+            />
+          )}
+        </AnimatePresence>
+      </motion.div>
     </motion.div>
   );
 }

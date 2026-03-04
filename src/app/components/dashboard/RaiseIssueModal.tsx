@@ -215,6 +215,7 @@ export function RaiseIssueModal({
         exit={{ opacity: 0, scale: 0.92, y: 20 }}
         transition={{ type: "spring", damping: 26, stiffness: 300 }}
         className="relative bg-white rounded-[16px] shadow-[0px_25px_50px_-12px_rgba(0,0,0,0.25)] w-full max-w-[464px] max-h-[90vh] flex flex-col overflow-hidden"
+        style={{ willChange: "transform, opacity" }}
       >
         {/* Header */}
         <div className="px-6 pt-5 pb-4 border-b border-[#f1f5f9] flex items-center justify-between shrink-0">

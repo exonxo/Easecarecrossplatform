@@ -259,6 +259,7 @@ export function WorkerProfileModal({
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       className="fixed inset-0 z-[60] flex flex-col bg-[#f6f8fc]"
+      style={{ willChange: "opacity" }}
     >
       {/* Scrollable content */}
       <div className="flex-1 overflow-y-auto no-scrollbar">
