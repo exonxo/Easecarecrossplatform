@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "motion/react";
+import { useModalOverlay } from "../../context/ModalContext";
 import {
   X,
   Send,
@@ -160,6 +161,7 @@ export function RaiseIssueModal({
   bookingId: string;
   providerName: string;
 }) {
+  useModalOverlay(isOpen);
   const [priority, setPriority] = useState<Priority>("urgent");
   const [category, setCategory] = useState<IssueCategory>("");
   const [description, setDescription] = useState("");

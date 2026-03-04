@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { motion, AnimatePresence, useMotionValue, useAnimation } from "motion/react";
+import { useModalOverlay } from "../../context/ModalContext";
 
 interface Message {
   id: number;
@@ -124,6 +125,7 @@ function MessageBubble({ msg, index, isInitial }: { msg: Message; index: number;
 }
 
 export function ChatModal({ isOpen, onClose }: ChatModalProps) {
+  useModalOverlay(isOpen);
   const [messages, setMessages] = useState<Message[]>(mockMessages);
   const [input, setInput] = useState("");
   const [isTyping, setIsTyping] = useState(false);
@@ -218,7 +220,7 @@ export function ChatModal({ isOpen, onClose }: ChatModalProps) {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.35, ease: "easeOut" }}
-            className="absolute inset-0 bg-black/45 backdrop-blur-[3px]"
+            className="absolute inset-0 bg-black/45 backdrop-blur-[3px] touch-none"
             onClick={onClose}
           />
 

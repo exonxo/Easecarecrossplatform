@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
+import { useModalOverlay } from "../../context/ModalContext";
 import {
   X,
   Star,
@@ -247,6 +248,7 @@ export function WorkerProfileModal({
   onReject: () => void;
   status: "pending" | "accepted" | "rejected";
 }) {
+  useModalOverlay(true); // always open when rendered
   const ext = EXTENDED_DATA[profile.id] || EXTENDED_DATA.b1;
   const [showAllReviews, setShowAllReviews] = useState(false);
   const displayedReviews = showAllReviews

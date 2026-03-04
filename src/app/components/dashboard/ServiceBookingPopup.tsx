@@ -1,6 +1,7 @@
 import { useState, useCallback } from "react";
 import { ArrowLeft, Clock, CheckCircle2 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
+import { useModalOverlay } from "../../context/ModalContext";
 import { BookingCheckout, type CheckoutProfile } from "./BookingCheckout";
 import {
   PaymentFlow,
@@ -105,6 +106,7 @@ export function ServiceBookingPopup({
   onClose,
   onComplete,
 }: ServiceBookingPopupProps) {
+  useModalOverlay(isOpen);
   const [step, setStep] = useState<PopupStep>("details");
   const [dateRange, setDateRange] = useState<DateRange | null>(null);
   const [selectedTime, setSelectedTime] = useState("9:00 AM");
@@ -166,12 +168,13 @@ export function ServiceBookingPopup({
           transition={{ duration: 0.2 }}
         >
           <motion.div
-            className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+            className="absolute inset-0 bg-black/50 backdrop-blur-sm touch-none"
             onClick={handleClose}
           />
 
           <motion.div
             className="relative mt-auto md:mt-0 bg-[#f9fafb] rounded-t-[24px] md:rounded-[24px] max-h-[92vh] md:max-h-[85vh] md:w-full md:max-w-[520px] flex flex-col overflow-hidden"
+            style={{ overscrollBehavior: "contain" }}
             initial={{ y: "100%" }}
             animate={{ y: 0 }}
             exit={{ y: "100%" }}

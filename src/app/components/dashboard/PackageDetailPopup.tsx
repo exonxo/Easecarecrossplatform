@@ -1,6 +1,7 @@
 import { useState, useCallback } from "react";
 import { ArrowLeft, Clock } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
+import { useModalOverlay } from "../../context/ModalContext";
 import { ImageWithFallback } from "../figma/ImageWithFallback";
 import svgCheckPath from "../../../imports/svg-vfjnzpb7vy";
 import { BookingCheckout, type CheckoutProfile } from "./BookingCheckout";
@@ -199,6 +200,7 @@ export function PackageDetailPopup({
   onClose,
   onProceed,
 }: PackageDetailPopupProps) {
+  useModalOverlay(isOpen);
   const [step, setStep] = useState<PopupStep>("details");
   const [dateRange, setDateRange] = useState<DateRange | null>(null);
 

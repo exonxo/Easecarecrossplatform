@@ -1,5 +1,6 @@
 import { motion, AnimatePresence } from "motion/react";
 import { Zap, Megaphone, ArrowRight, X } from "lucide-react";
+import { useModalOverlay } from "../../context/ModalContext";
 
 export function ChooseModePopup({
   open,
@@ -12,6 +13,8 @@ export function ChooseModePopup({
   onBidPost: () => void;
   onClose: () => void;
 }) {
+  useModalOverlay(open);
+
   return (
     <AnimatePresence>
       {open && (
@@ -23,7 +26,7 @@ export function ChooseModePopup({
             exit={{ opacity: 0 }}
             transition={{ duration: 0.25 }}
             onClick={onClose}
-            className="fixed inset-0 z-[60] bg-black/40"
+            className="fixed inset-0 z-[60] bg-black/40 touch-none"
           />
 
           {/* Bottom sheet */}
@@ -33,7 +36,7 @@ export function ChooseModePopup({
             exit={{ y: "100%" }}
             transition={{ type: "spring", damping: 28, stiffness: 300 }}
             className="fixed bottom-0 left-0 right-0 md:bottom-auto md:left-auto md:right-auto md:fixed md:inset-0 md:m-auto md:h-fit z-[61] bg-[#f6f8fc] rounded-t-[28px] md:rounded-[28px] shadow-[0_-8px_40px_-8px_rgba(0,0,0,0.15)] max-h-[85vh] md:max-w-[480px] md:w-full flex flex-col"
-            style={{ willChange: "transform" }}
+            style={{ willChange: "transform", overscrollBehavior: "contain" }}
           >
             {/* Drag handle */}
             <div className="flex justify-center pt-3 pb-1 shrink-0 md:hidden">

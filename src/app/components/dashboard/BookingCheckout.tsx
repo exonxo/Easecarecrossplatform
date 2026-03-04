@@ -24,6 +24,7 @@ import {
 } from "lucide-react";
 import { ImageWithFallback } from "../figma/ImageWithFallback";
 import { PrimaryButton } from "../shared/PrimaryButton";
+import { useModalOverlay } from "../../context/ModalContext";
 
 
 // ─── Generic profile type that works with both BidProfile and ProviderProfile ───
@@ -149,7 +150,7 @@ function CouponSheet({
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="absolute inset-0 bg-black/50 backdrop-blur-[2px]"
+        className="absolute inset-0 bg-black/50 backdrop-blur-[2px] touch-none"
         onClick={onClose}
       />
       <motion.div
@@ -158,6 +159,7 @@ function CouponSheet({
         exit={{ y: "100%" }}
         transition={{ type: "spring", damping: 30, stiffness: 320 }}
         className="relative w-full max-w-[420px] bg-white rounded-t-[24px] md:rounded-[24px] max-h-[80vh] flex flex-col"
+        style={{ overscrollBehavior: "contain" }}
       >
         {/* Handle */}
         <div className="flex justify-center pt-3 pb-1 md:hidden">
@@ -332,6 +334,8 @@ export function BookingCheckout({
 
   const serviceItems = getServiceItems(profile);
 
+  useModalOverlay(true); // BookingCheckout is always open when rendered
+
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -345,7 +349,7 @@ export function BookingCheckout({
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="absolute inset-0 bg-black/50 backdrop-blur-[2px]"
+        className="absolute inset-0 bg-black/50 backdrop-blur-[2px] touch-none"
         onClick={onClose}
       />
 
@@ -356,6 +360,7 @@ export function BookingCheckout({
         exit={{ y: "100%" }}
         transition={{ type: "spring", damping: 30, stiffness: 320 }}
         className="relative w-full max-w-[420px] bg-[#f6f8fc] rounded-t-[24px] md:rounded-[24px] flex flex-col max-h-[92vh] md:max-h-[85vh]"
+        style={{ overscrollBehavior: "contain" }}
       >
         {/* Handle (mobile) */}
         <div className="flex justify-center pt-3 pb-1 md:hidden">

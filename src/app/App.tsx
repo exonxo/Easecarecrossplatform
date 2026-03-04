@@ -12,15 +12,18 @@ import { AuthProvider } from "./context/AuthContext";
 import { BookingProvider } from "./context/BookingContext";
 import { ErrorBoundary } from "./components/shared/ErrorBoundary";
 import { CapacitorShell } from "./components/shared/CapacitorShell";
+import { ModalProvider } from "./context/ModalContext";
 
 export default function App() {
   return (
     <ErrorBoundary>
       <AuthProvider>
         <BookingProvider>
-          <CapacitorShell>
-            <RouterProvider router={router} />
-          </CapacitorShell>
+          <ModalProvider>
+            <CapacitorShell>
+              <RouterProvider router={router} />
+            </CapacitorShell>
+          </ModalProvider>
         </BookingProvider>
       </AuthProvider>
     </ErrorBoundary>
