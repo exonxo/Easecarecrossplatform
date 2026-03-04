@@ -5,18 +5,20 @@ import { ImageWithFallback } from "../figma/ImageWithFallback";
 import svgPaths from "../../../imports/svg-zdwmi91rdf";
 import { useBooking } from "../../context/BookingContext";
 import { motion, AnimatePresence, useMotionValue, useTransform } from "motion/react";
-import L from "leaflet";
 
-// Custom pin icon for Leaflet
-const locationIcon = L.divIcon({
-  className: "",
-  html: `<div style="display:flex;align-items:center;justify-content:center;width:36px;height:36px;background:#1975D2;border-radius:50% 50% 50% 0;transform:rotate(-45deg);border:3px solid white;box-shadow:0 4px 12px rgba(0,0,0,0.3);">
-    <div style="width:10px;height:10px;background:white;border-radius:50%;transform:rotate(45deg);"></div>
-  </div>`,
-  iconSize: [36, 36],
-  iconAnchor: [18, 36],
-  popupAnchor: [0, -36],
-});
+// Leaflet is loaded lazily to avoid blocking eager route initialization
+let L: typeof import("leaflet") | null = null;
+let leafletReady: Promise<typeof import("leaflet")> | null = null;
+
+function getLeaflet() {
+  if (!leafletReady) {
+    leafletReady = import("leaflet").then((mod) => {
+      L = mod.default ?? mod;
+      return L;
+    });
+  }
+  return leafletReady;
+}
 
 // Salt Lake Sector V, Kolkata coords
 const SERVICE_LOCATION: [number, number] = [22.5726, 88.4379];
@@ -24,38 +26,56 @@ const SERVICE_LOCATION: [number, number] = [22.5726, 88.4379];
 // ─── Plain Leaflet Map Component ───
 function LeafletMap({ isVisible }: { isVisible: boolean }) {
   const mapRef = useRef<HTMLDivElement>(null);
-  const mapInstanceRef = useRef<L.Map | null>(null);
+  const mapInstanceRef = useRef<any>(null);
 
   useEffect(() => {
     if (!isVisible || !mapRef.current || mapInstanceRef.current) return;
 
-    const map = L.map(mapRef.current, {
-      center: SERVICE_LOCATION,
-      zoom: 15,
-      scrollWheelZoom: false,
-      zoomControl: false,
-      attributionControl: false,
-      dragging: true,
+    let cancelled = false;
+    getLeaflet().then((Lmod) => {
+      if (cancelled || !mapRef.current || mapInstanceRef.current) return;
+
+      const locationIcon = Lmod.divIcon({
+        className: "",
+        html: `<div style="display:flex;align-items:center;justify-content:center;width:36px;height:36px;background:#1975D2;border-radius:50% 50% 50% 0;transform:rotate(-45deg);border:3px solid white;box-shadow:0 4px 12px rgba(0,0,0,0.3);">
+    <div style="width:10px;height:10px;background:white;border-radius:50%;transform:rotate(45deg);"></div>
+  </div>`,
+        iconSize: [36, 36] as [number, number],
+        iconAnchor: [18, 36] as [number, number],
+        popupAnchor: [0, -36] as [number, number],
+      });
+
+      const map = Lmod.map(mapRef.current!, {
+        center: SERVICE_LOCATION,
+        zoom: 15,
+        scrollWheelZoom: false,
+        zoomControl: false,
+        attributionControl: false,
+        dragging: true,
+      });
+
+      Lmod.tileLayer(
+        "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
+      ).addTo(map);
+
+      Lmod.marker(SERVICE_LOCATION, { icon: locationIcon })
+        .addTo(map)
+        .bindPopup(
+          '<span style="font-family:Lexend,sans-serif;font-size:13px">Service Location</span>'
+        );
+
+      mapInstanceRef.current = map;
+      setTimeout(() => map.invalidateSize(), 200);
+    }).catch(() => {
+      // leaflet failed to load — no-op
     });
 
-    L.tileLayer(
-      "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
-    ).addTo(map);
-
-    L.marker(SERVICE_LOCATION, { icon: locationIcon })
-      .addTo(map)
-      .bindPopup(
-        '<span style="font-family:Lexend,sans-serif;font-size:13px">Service Location</span>'
-      );
-
-    mapInstanceRef.current = map;
-
-    // Invalidate size after a short delay to ensure container is rendered
-    setTimeout(() => map.invalidateSize(), 200);
-
     return () => {
-      map.remove();
-      mapInstanceRef.current = null;
+      cancelled = true;
+      if (mapInstanceRef.current) {
+        mapInstanceRef.current.remove();
+        mapInstanceRef.current = null;
+      }
     };
   }, [isVisible]);
 

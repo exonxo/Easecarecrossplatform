@@ -8,12 +8,18 @@
  *   4. RegistrationStep - Name, email, relationship form
  *   5. LocationStep  - Location selection with geolocation
  *
+ * Auth integration:
+ *   - After OTP verification, calls auth.login(phone).
+ *   - If phone is 8670803180, onboarding is auto-complete → navigate to "/".
+ *   - Otherwise, continues through Features → Registration → Location.
+ *   - On final step, calls auth.completeOnboarding() then navigates to "/".
+ *
  * Uses AnimatePresence from Motion for slide transitions between screens.
- * On completion, navigates to "/" (dashboard).
  */
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { useNavigate } from "react-router";
 import { motion, AnimatePresence } from "motion/react";
+import { useAuth } from "../../context/AuthContext";
 import { PhoneEntryScreen } from "./PhoneStep";
 import { OtpVerificationScreen } from "./OtpStep";
 import { FeaturesCarouselScreen } from "./FeaturesStep";
@@ -21,6 +27,8 @@ import { RegistrationScreen } from "./RegistrationStep";
 import { LocationScreen } from "./LocationStep";
 
 type Screen = "phone" | "otp" | "features" | "registration" | "location";
+
+const SKIP_ONBOARDING_PHONE = "8670803180";
 
 const variants = {
   enter: (dir: number) => ({
@@ -39,15 +47,39 @@ export function OnboardingFlow() {
   const [phone, setPhone] = useState("");
   const [direction, setDirection] = useState(1);
   const navigate = useNavigate();
+  const auth = useAuth();
+
+  // If user is already fully authenticated, redirect away
+  useEffect(() => {
+    if (!auth.loading && auth.user && auth.profile?.onboardingComplete) {
+      navigate("/", { replace: true });
+    }
+  }, [auth.loading, auth.user, auth.profile, navigate]);
 
   const goTo = useCallback((next: Screen, dir: number = 1) => {
     setDirection(dir);
     setScreen(next);
   }, []);
 
-  const handleComplete = () => {
-    navigate("/");
-  };
+  /** Called after OTP verification succeeds */
+  const handleOtpVerify = useCallback(() => {
+    // Create session
+    auth.login(phone);
+
+    if (phone === SKIP_ONBOARDING_PHONE) {
+      // Known phone — skip to home immediately
+      navigate("/", { replace: true });
+    } else {
+      // New user — continue onboarding
+      goTo("features");
+    }
+  }, [phone, auth, navigate, goTo]);
+
+  /** Called when the final location step completes */
+  const handleComplete = useCallback(() => {
+    auth.completeOnboarding();
+    navigate("/", { replace: true });
+  }, [auth, navigate]);
 
   const renderScreen = () => {
     switch (screen) {
@@ -64,7 +96,7 @@ export function OnboardingFlow() {
         return (
           <OtpVerificationScreen
             phone={phone}
-            onVerify={() => goTo("features")}
+            onVerify={handleOtpVerify}
             onBack={() => goTo("phone", -1)}
             onChangeNumber={() => goTo("phone", -1)}
           />
@@ -103,8 +135,8 @@ export function OnboardingFlow() {
           initial="enter"
           animate="center"
           exit="exit"
-          transition={{ type: "tween", duration: 0.35, ease: "easeInOut" }}
-          className="absolute inset-0"
+          transition={{ type: "tween", duration: 0.3, ease: [0.25, 0.1, 0.25, 1] }}
+          className="absolute inset-0 will-change-transform"
         >
           {renderScreen()}
         </motion.div>

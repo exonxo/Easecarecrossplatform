@@ -1,8 +1,9 @@
 /**
  * AuthGuard - Route protection components for authenticated/unauthenticated access.
  *
- * RequireAuth:     Wraps dashboard routes; redirects to "/" if not logged in.
- * RedirectIfAuth:  Wraps onboarding route; redirects to "/" if already logged in.
+ * RequireAuth:     Wraps dashboard routes; redirects to "/onboarding" if not logged in
+ *                  or if onboarding is incomplete.
+ * RedirectIfAuth:  Wraps onboarding route; redirects to "/" if already fully onboarded.
  */
 import { Navigate } from "react-router";
 import { useAuth } from "../../context/AuthContext";
@@ -19,19 +20,26 @@ function LoadingScreen() {
 }
 
 /**
- * Protects dashboard routes — redirects to / if not authenticated.
+ * Protects dashboard routes — redirects to /onboarding if not authenticated
+ * or if onboarding hasn't been completed.
  */
 export function RequireAuth({ children }: { children: React.ReactNode }) {
-  const { user, loading } = useAuth();
+  const { user, profile, loading } = useAuth();
 
   if (loading) return <LoadingScreen />;
-  if (!user) return <Navigate to="/" replace />;
+
+  // No session at all → go to onboarding login
+  if (!user) return <Navigate to="/onboarding" replace />;
+
+  // Logged in but hasn't finished onboarding → send back to onboarding
+  // (OnboardingFlow will pick up where they left off based on profile state)
+  if (!profile?.onboardingComplete) return <Navigate to="/onboarding" replace />;
 
   return <>{children}</>;
 }
 
 /**
- * Redirects authenticated users away from onboarding to dashboard.
+ * Redirects authenticated + onboarded users away from onboarding to dashboard.
  */
 export function RedirectIfAuth({ children }: { children: React.ReactNode }) {
   const { user, profile, loading } = useAuth();

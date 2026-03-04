@@ -14,7 +14,7 @@ export function BottomNav() {
   return (
     <nav className="md:hidden fixed bottom-0 left-0 right-0 z-30">
       {/* Floating pill container */}
-      <div className="mx-4 mb-4">
+      <div className="mx-4 mb-4" style={{ paddingBottom: 'var(--safe-area-bottom, 0px)' }}>
         <div className="bg-white rounded-[24px] shadow-[0_4px_24px_rgba(0,0,0,0.08),0_1px_4px_rgba(0,0,0,0.04)] border border-[#f1f5f9]">
           <div className="flex items-center justify-center px-2 py-2">
             {navItems.map((item) => {

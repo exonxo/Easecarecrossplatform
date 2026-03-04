@@ -13,3 +13,23 @@ html, body {
   height: 100%;
   min-height: 100vh;
 }
+
+/* Safe-area support for Capacitor native builds */
+html {
+  /* Ensure viewport-fit=cover for proper safe-area-inset values on iOS */
+  --safe-area-top: env(safe-area-inset-top, 0px);
+  --safe-area-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-area-left: env(safe-area-inset-left, 0px);
+  --safe-area-right: env(safe-area-inset-right, 0px);
+}
+
+/* Ensure touch interactions work properly on native */
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Minimum touch target size for accessibility (48x48dp) */
+button, a, [role="button"] {
+  min-height: 44px;
+  min-width: 44px;
+}

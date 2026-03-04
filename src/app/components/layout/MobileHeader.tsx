@@ -10,7 +10,7 @@ export function MobileHeader() {
   const [isChatOpen, setIsChatOpen] = useState(false);
   return (
     <>
-    <div className="md:hidden sticky top-0 z-20 bg-[rgba(255,255,255,0.95)] backdrop-blur-[6px]">
+    <div className="md:hidden sticky top-0 z-20 bg-[rgba(255,255,255,0.95)] backdrop-blur-[6px]" style={{ paddingTop: 'var(--safe-area-top, 0px)' }}>
       {/* Border bottom */}
       <div
         aria-hidden

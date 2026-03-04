@@ -21,9 +21,15 @@ import {
 import { ImageWithFallback } from "../figma/ImageWithFallback";
 import { dataService } from "../../services/DataService";
 import { isApiReachable } from "../../services/api";
+import { useAuth } from "../../context/AuthContext";
+import { useBooking } from "../../context/BookingContext";
+import { AnimatePresence, motion } from "motion/react";
 
 const AVATAR_URL =
   "https://images.unsplash.com/photo-1672685667592-0392f458f46f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxwcm9mZXNzaW9uYWwlMjBtYW4lMjBwb3J0cmFpdCUyMGhlYWRzaG90fGVufDF8fHx8MTc3MTk0MzA3Mnww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral";
+
+/** Completed-gigs localStorage key (mirror of BookingContext) */
+const COMPLETED_GIGS_KEY = "ec_completed_gigs";
 
 interface UserProfile {
   name: string;
@@ -220,8 +226,19 @@ function EditProfileModal({
 export function ProfilePage() {
   const [user, setUser] = useState(mockUser);
   const [showEdit, setShowEdit] = useState(false);
+  const [showSignOutConfirm, setShowSignOutConfirm] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
+  const { logout } = useAuth();
+  const { clearBooking } = useBooking();
+
+  /** Full sign-out: clear auth + booking + completed gigs, then redirect */
+  const handleSignOut = () => {
+    clearBooking();
+    try { localStorage.removeItem(COMPLETED_GIGS_KEY); } catch { /* noop */ }
+    logout();
+    navigate("/onboarding", { replace: true });
+  };
 
   // Load profile from Supabase on mount
   useEffect(() => {
@@ -413,7 +430,7 @@ export function ProfilePage() {
                         key={item.label}
                         onClick={() => {
                           if (item.danger) {
-                            navigate("/onboarding");
+                            setShowSignOutConfirm(true);
                           } else if (item.route) {
                             navigate(item.route);
                           }
@@ -484,6 +501,58 @@ export function ProfilePage() {
       {showEdit && (
         <EditProfileModal user={user} onClose={() => setShowEdit(false)} onSave={handleSave} />
       )}
+
+      {/* Sign Out Confirmation Modal */}
+      <AnimatePresence>
+        {showSignOutConfirm && (
+          <motion.div
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+            <div className="bg-white rounded-[20px] w-full max-w-[480px] max-h-[90vh] overflow-y-auto shadow-2xl">
+              {/* Header */}
+              <div className="flex items-center justify-between p-5 border-b border-gray-100">
+                <h3 className="font-['Inter',sans-serif] font-semibold text-[18px] text-[#111827]">
+                  Sign Out
+                </h3>
+                <button
+                  onClick={() => setShowSignOutConfirm(false)}
+                  className="p-2 rounded-full hover:bg-gray-100 transition-colors cursor-pointer"
+                >
+                  <X size={20} className="text-gray-500" />
+                </button>
+              </div>
+
+              {/* Content */}
+              <div className="px-5 py-6 space-y-4">
+                <p className="font-['Inter',sans-serif] text-[15px] text-[#111827]">
+                  Are you sure you want to sign out?
+                </p>
+                <div className="flex items-center justify-end gap-4">
+                  <button
+                    onClick={() => setShowSignOutConfirm(false)}
+                    className="w-full flex items-center justify-center gap-2 py-3 px-6 rounded-[10px] bg-[#f9fafb] border border-[#e5e7eb] hover:bg-[#f0f4f8] hover:border-[#d1d5db] active:scale-[0.98] transition-all cursor-pointer"
+                  >
+                    <span className="font-['Inter',sans-serif] font-medium text-[14px] text-[#111827]">
+                      Cancel
+                    </span>
+                  </button>
+                  <button
+                    onClick={handleSignOut}
+                    className="w-full flex items-center justify-center gap-2 py-3 px-6 rounded-[10px] bg-[#EF4444] text-white font-['Inter',sans-serif] font-semibold text-[14px] hover:bg-[#DC2626] active:scale-[0.98] transition-all cursor-pointer"
+                  >
+                    <span className="font-['Inter',sans-serif] font-medium text-[14px] text-white">
+                      Sign Out
+                    </span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </>
   );
 }
