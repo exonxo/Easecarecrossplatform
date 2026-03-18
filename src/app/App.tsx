@@ -1,7 +1,7 @@
 /**
  * App - Root component for EasyCare.
  *
- * Wraps the app in ErrorBoundary → AuthProvider → BookingProvider → Router.
+ * Wraps the app in ErrorBoundary -> AuthProvider -> BookingProvider -> Router.
  * Initializes Capacitor StatusBar + BackButton handling via useCapacitorInit.
  * Renders a "Press back again to exit" toast on native platforms.
  */
