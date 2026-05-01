@@ -2,8 +2,11 @@
  * ModalContext - Tracks whether any modal/bottom sheet is open.
  *
  * When a modal registers itself as open, DashboardLayout hides the
- * top and bottom navigation bars. Also provides a useModalOverlay()
- * hook that handles scroll-lock (body overflow hidden) automatically.
+ * top and bottom navigation bars.
+ *
+ * Scroll-lock is managed centrally by ModalProvider based on openCount,
+ * NOT inside each modal component. This prevents nested modals from
+ * prematurely re-enabling scroll when one of them closes.
  */
 import {
   createContext,
@@ -16,13 +19,9 @@ import {
 } from "react";
 
 interface ModalContextValue {
-  /** Number of currently open modals */
   openCount: number;
-  /** Whether at least one modal is open */
   isAnyModalOpen: boolean;
-  /** Called when a modal opens */
   register: () => void;
-  /** Called when a modal closes */
   unregister: () => void;
 }
 
@@ -39,6 +38,16 @@ export function ModalProvider({ children }: { children: ReactNode }) {
   const register = useCallback(() => setOpenCount((c) => c + 1), []);
   const unregister = useCallback(() => setOpenCount((c) => Math.max(0, c - 1)), []);
 
+  // Central scroll-lock: only ModalProvider touches body.overflow.
+  // Nested modals can open/close independently without one accidentally
+  // re-enabling scroll while another is still open.
+  useEffect(() => {
+    document.body.style.overflow = openCount > 0 ? "hidden" : "";
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [openCount]);
+
   return (
     <ModalCtx.Provider
       value={{ openCount, isAnyModalOpen: openCount > 0, register, unregister }}
@@ -53,12 +62,9 @@ export function useModalContext() {
 }
 
 /**
- * useModalOverlay - call this inside every modal/bottom-sheet component.
- *
- * When `isOpen` is true it:
- *  1. Registers with ModalContext so nav bars hide
- *  2. Locks body scroll (overflow: hidden)
- *  3. Cleans up on close / unmount
+ * useModalOverlay — call inside every modal/bottom-sheet component.
+ * Registers/unregisters so DashboardLayout nav bars hide correctly.
+ * Does NOT touch body.overflow — ModalProvider owns that.
  */
 export function useModalOverlay(isOpen: boolean) {
   const { register, unregister } = useContext(ModalCtx);
@@ -70,16 +76,13 @@ export function useModalOverlay(isOpen: boolean) {
         register();
         registered.current = true;
       }
-      document.body.style.overflow = "hidden";
     } else {
       if (registered.current) {
         unregister();
         registered.current = false;
       }
-      document.body.style.overflow = "";
     }
     return () => {
-      document.body.style.overflow = "";
       if (registered.current) {
         unregister();
         registered.current = false;

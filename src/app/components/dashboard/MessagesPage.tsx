@@ -701,29 +701,9 @@ export function MessagesPage() {
           activeId ? "hidden md:flex" : "flex"
         }`}
       >
-        {/* Mobile title */}
-        <div className="md:hidden px-4 pt-3 pb-1">
-          <div className="flex items-center justify-between">
-            <h1 className="font-['Lexend',sans-serif] font-bold text-[30px] text-[#0f172a] tracking-[-0.75px]">
-              Messages
-            </h1>
-            <button className="flex items-center gap-2 bg-white border border-[#e5e7eb] rounded-full px-[17px] py-[9px] cursor-pointer hover:bg-[#f9fafb] transition-colors">
-              <svg width={13.5} height={16.52} viewBox="0 0 13.5 16.5234" fill="none">
-                <path d={svgPaths.p1e6496b0} fill="#111827" />
-              </svg>
-              <span className="font-['Inter',sans-serif] font-medium text-[14px] text-[#111827]">
-                Help
-              </span>
-            </button>
-          </div>
-        </div>
-
-        {/* Desktop title */}
-        <div className="hidden md:flex items-center justify-between px-5 pt-5 pb-1">
-          <h2 className="font-['Inter',sans-serif] font-semibold text-[18px] text-[#0f172a]">
-            Messages
-          </h2>
-          <span className="font-['Inter',sans-serif] text-[13px] text-[#94a3b8]">
+        {/* Unread count — desktop only, replaces old title row */}
+        <div className="hidden md:flex items-center justify-end px-5 pt-4 pb-1">
+          <span className="font-['Inter',sans-serif] text-[12px] text-[#94a3b8]">
             {conversations.filter((c) => c.unread > 0).length} unread
           </span>
         </div>

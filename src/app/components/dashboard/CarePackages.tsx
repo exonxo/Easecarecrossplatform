@@ -10,6 +10,8 @@ import {
   type PackageDetail,
 } from "./PackageDetailPopup";
 import { useBooking } from "../../context/BookingContext";
+import { useRequireAuth } from "../../hooks/useRequireAuth";
+import { LoginModal } from "../auth/LoginModal";
 
 const packages = [
   {
@@ -295,16 +297,19 @@ function PackageCard({
 export function CarePackages() {
   const navigate = useNavigate();
   const { setBookedProvider } = useBooking();
+  const { requireAuth, loginOpen, setLoginOpen } = useRequireAuth();
   const [selectedPkg, setSelectedPkg] = useState<PackageDetail | null>(null);
   const [popupOpen, setPopupOpen] = useState(false);
   const [showAll, setShowAll] = useState(false);
 
   const handleCardTap = (title: string) => {
-    const detail = PACKAGE_DETAILS[title];
-    if (detail) {
-      setSelectedPkg(detail);
-      setPopupOpen(true);
-    }
+    requireAuth(() => {
+      const detail = PACKAGE_DETAILS[title];
+      if (detail) {
+        setSelectedPkg(detail);
+        setPopupOpen(true);
+      }
+    });
   };
 
   const handleProceed = (pkg: PackageDetail) => {
@@ -423,9 +428,9 @@ export function CarePackages() {
         ))}
       </div>
 
-      {/* Desktop: grid — show first 4 */}
-      <div className="hidden md:grid grid-cols-4 gap-5">
-        {packages.slice(0, 4).map((pkg) => (
+      {/* Desktop: 3-col grid — show first 6 (2 rows) */}
+      <div className="hidden md:grid grid-cols-3 gap-5">
+        {packages.slice(0, 6).map((pkg) => (
           <PackageCard
             key={pkg.title}
             pkg={pkg}
@@ -444,6 +449,8 @@ export function CarePackages() {
         }}
         onProceed={handleProceed}
       />
+
+      <LoginModal open={loginOpen} onOpenChange={setLoginOpen} />
     </div>
   );
 }

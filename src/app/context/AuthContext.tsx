@@ -32,6 +32,7 @@ export interface UserProfile {
   phone: string;
   name?: string;
   email?: string;
+  gender?: string;
   relationship?: string;
   location?: string;
   onboardingComplete: boolean;
@@ -60,7 +61,11 @@ const AuthContext = createContext<AuthContextType>({
 });
 
 function generateUid(phone: string): string {
-  return `user_${phone}_${Date.now().toString(36)}`;
+  // crypto.randomUUID() is available in all modern browsers and is cryptographically secure
+  const random = typeof crypto !== "undefined" && crypto.randomUUID
+    ? crypto.randomUUID().replace(/-/g, "").slice(0, 12)
+    : Math.random().toString(36).slice(2, 14);
+  return `user_${phone}_${random}`;
 }
 
 export function AuthProvider({ children }: { children: ReactNode }) {
@@ -110,11 +115,29 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const newUser: User = { uid, phoneNumber: phone };
     const isKnown = phone === SKIP_ONBOARDING_PHONE;
 
+    // Detect returning user: if stored profile belongs to same phone and is complete
+    let returningData: Partial<UserProfile> = {};
+    try {
+      const stored = localStorage.getItem(PROFILE_KEY);
+      if (stored) {
+        const parsed: UserProfile = JSON.parse(stored);
+        if (parsed.phone === phone && parsed.onboardingComplete) {
+          returningData = {
+            name: parsed.name,
+            email: parsed.email,
+            gender: parsed.gender,
+            relationship: parsed.relationship,
+            onboardingComplete: true,
+          };
+        }
+      }
+    } catch { /* noop */ }
+
     const newProfile: UserProfile = {
       uid,
       phone,
-      onboardingComplete: isKnown,
-      ...(isKnown ? { name: "EaseCare User" } : {}),
+      onboardingComplete: isKnown || (returningData.onboardingComplete ?? false),
+      ...(isKnown ? { name: "EaseCare User" } : returningData),
     };
 
     setUser(newUser);

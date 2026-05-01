@@ -28,12 +28,8 @@ export function RequireAuth({ children }: { children: React.ReactNode }) {
 
   if (loading) return <LoadingScreen />;
 
-  // No session at all → go to onboarding login
-  if (!user) return <Navigate to="/onboarding" replace />;
-
-  // Logged in but hasn't finished onboarding → send back to onboarding
-  // (OnboardingFlow will pick up where they left off based on profile state)
-  if (!profile?.onboardingComplete) return <Navigate to="/onboarding" replace />;
+  // No session or incomplete onboarding → back to home (Login button is in TopNav)
+  if (!user || !profile?.onboardingComplete) return <Navigate to="/" replace />;
 
   return <>{children}</>;
 }

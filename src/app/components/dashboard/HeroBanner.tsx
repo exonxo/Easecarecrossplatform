@@ -2,15 +2,13 @@ import { useState, useRef, useCallback, useEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { ImageWithFallback } from "../figma/ImageWithFallback";
-import imgElderlyCarePeacefulMoment from "figma:asset/57d14312abfea6d53affec2e13993c9e59a386f5.png";
-
 const slides = [
   {
     badge: "LIMITED OFFER",
     title: "First 3 Bookings — 15% OFF",
     subtitle: "Use code: WELCOME15",
     cta: "Claim Now",
-    image: imgElderlyCarePeacefulMoment,
+    image: "https://images.unsplash.com/photo-1762237798221-a298c91e18a3?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixlib=rb-4.1.0&q=80&w=1080",
     badgeColor: "#f97316",
   },
   {
@@ -86,11 +84,74 @@ export function HeroBanner() {
 
   const slide = slides[current];
 
+  const featuredSlide = slides[0];
+
   return (
     <div className="flex flex-col gap-3 w-full">
-      {/* ── Banner container ── */}
+
+      {/* ── DESKTOP: vertical stack — big banner on top, 3 thumbnails in a row below ── */}
+      <div className="hidden lg:flex flex-col gap-3">
+
+        {/* Big featured banner — full width */}
+        <div className="relative w-full h-[280px] rounded-[20px] overflow-hidden">
+          <ImageWithFallback
+            src={featuredSlide.image}
+            alt="Featured promotion"
+            className="w-full h-full object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-black/20 to-black/5" />
+          <div className="absolute inset-0 z-10 flex flex-col justify-end p-8 max-w-[560px]">
+            <span
+              className="text-white font-['Lexend',sans-serif] font-bold text-[10px] px-2.5 py-1 rounded-full w-fit tracking-[0.5px] mb-3"
+              style={{ backgroundColor: featuredSlide.badgeColor }}
+            >
+              {featuredSlide.badge}
+            </span>
+            <h2 className="font-['Lexend',sans-serif] font-bold text-[30px] text-white leading-[1.2] mb-1">
+              {featuredSlide.title}
+            </h2>
+            <p className="font-['Inter',sans-serif] text-[14px] text-white/80 mb-4">
+              {featuredSlide.subtitle}
+            </p>
+            <button className="bg-white text-[#1975D2] font-['Lexend',sans-serif] font-bold text-[13px] px-6 py-2.5 rounded-full hover:bg-[#f0f7fa] transition-colors cursor-pointer w-fit shadow-[0_4px_12px_rgba(0,0,0,0.15)]">
+              {featuredSlide.cta}
+            </button>
+          </div>
+        </div>
+
+        {/* Smaller slides — 3-col horizontal row below */}
+        <div className="grid grid-cols-3 gap-3">
+          {slides.slice(1).map((slide) => (
+            <div
+              key={slide.badge}
+              className="relative h-[140px] rounded-[16px] overflow-hidden cursor-pointer group"
+            >
+              <ImageWithFallback
+                src={slide.image}
+                alt={slide.title}
+                className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+              <div className="absolute inset-0 z-10 flex flex-col justify-end p-3.5">
+                <span
+                  className="text-white font-['Lexend',sans-serif] font-bold text-[9px] px-2 py-0.5 rounded-full w-fit tracking-[0.5px] mb-1.5"
+                  style={{ backgroundColor: slide.badgeColor }}
+                >
+                  {slide.badge}
+                </span>
+                <p className="font-['Lexend',sans-serif] font-bold text-[13px] text-white leading-[18px] line-clamp-2">
+                  {slide.title}
+                </p>
+              </div>
+            </div>
+          ))}
+        </div>
+
+      </div>
+
+      {/* ── MOBILE: swipeable carousel ── */}
       <div
-        className="relative w-full aspect-[16/9] sm:aspect-[2/1] md:aspect-[5/2] lg:aspect-[3/1] min-h-[180px] max-h-[360px] rounded-[18px] md:rounded-[24px] overflow-hidden group select-none"
+        className="lg:hidden relative w-full aspect-[16/9] sm:aspect-[2/1] md:aspect-[5/2] min-h-[180px] max-h-[320px] rounded-[18px] md:rounded-[24px] overflow-hidden group select-none"
         onTouchStart={onTouchStart}
         onTouchMove={onTouchMove}
         onTouchEnd={onTouchEnd}
@@ -169,12 +230,10 @@ export function HeroBanner() {
           <ChevronRight size={20} className="text-white" />
         </button>
 
-        {/* ── Desktop dots inside banner ── */}
-        
       </div>
 
-      {/* ── Mobile chevron nav below banner ── */}
-      <div className="flex md:hidden gap-4 items-center justify-center">
+      {/* ── Mobile chevron nav below carousel ── */}
+      <div className="flex lg:hidden gap-4 items-center justify-center">
         <button
           onClick={prev}
           className="size-8 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 active:scale-95 transition-all cursor-pointer"

@@ -87,27 +87,37 @@ function NotFound() {
   return <Navigate to="/" replace />;
 }
 
-/**
- * Protected DashboardLayout wrapper — checks auth before rendering layout + children.
- */
-function ProtectedDashboardLayout() {
-  return (
-    <RequireAuth>
-      <DashboardLayout />
-    </RequireAuth>
-  );
-}
-
 export const router = createHashRouter([
   {
     path: "/",
-    Component: ProtectedDashboardLayout,
+    Component: DashboardLayout,
     errorElement: <RouteErrorBoundary />,
     children: [
       { index: true, element: <HomePage /> },
-      { path: "bookings", element: <MyBookings /> },
-      { path: "messages", element: <Messages /> },
-      { path: "profile", element: <Profile /> },
+      {
+        path: "bookings",
+        element: (
+          <RequireAuth>
+            <MyBookings />
+          </RequireAuth>
+        ),
+      },
+      {
+        path: "messages",
+        element: (
+          <RequireAuth>
+            <Messages />
+          </RequireAuth>
+        ),
+      },
+      {
+        path: "profile",
+        element: (
+          <RequireAuth>
+            <Profile />
+          </RequireAuth>
+        ),
+      },
     ],
   },
   {

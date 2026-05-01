@@ -1,32 +1,45 @@
-/**
- * HomePage - Main dashboard home screen composition.
- * Assembles: HeroSection → TrustBar → QuickCategories → HeroBanner → CarePackages → CommunitySection
- * Wrapped in PullToRefresh for mobile swipe-down refresh.
- */
 import { PullToRefresh } from "../layout/PullToRefresh";
 import { HeroBanner } from "./HeroBanner";
-import { HeroSection } from "./HeroSection";
+import { CompactHero } from "./CompactHero";
 import { QuickCategories } from "./QuickCategories";
+import { FeaturedCategory } from "./FeaturedCategory";
+import { PostRequirementStrip } from "./PostRequirementStrip";
 import { CarePackages } from "./CarePackages";
 import { CommunitySection } from "./CommunitySection";
-import { TrustBar } from "./TrustBar";
 
 export function HomePage() {
   return (
     <PullToRefresh>
       <main className="flex-1 pb-[100px] md:pb-0">
-        <div className="w-full min-w-0 max-w-[1180px] mx-auto px-4 md:px-8 pt-4 md:pt-7 pb-4 flex flex-col gap-6 md:gap-8 overflow-hidden box-border bg-white mx-[0px] mt-[0px] mb-[80px]">
-          <HeroSection />
-          <TrustBar />
+        <div className="w-full min-w-0 max-w-[1180px] mx-auto px-4 md:px-8 pt-5 md:pt-7 pb-6 flex flex-col gap-8 md:gap-10">
+
+          {/* ── Search + greeting ── */}
+          <CompactHero />
+
+          {/* ── Post Requirement action strip ── */}
+          <PostRequirementStrip />
+
+          {/* ── All 8 category shortcuts (UC-style grid) ── */}
           <QuickCategories />
+
+          {/* ── Promotional banners ── */}
           <HeroBanner />
+
+          {/* ── Elder Care — expanded inline (priority category) ── */}
+          <FeaturedCategory categoryLabel="Elder Care" />
+
+          {/* ── Cleaning — expanded inline (priority category) ── */}
+          <FeaturedCategory categoryLabel="Cleaning" />
+
+          {/* ── Care packages ── */}
           <CarePackages />
+
         </div>
-        {/* Community section goes full bleed on mobile */}
-        <div className="md:max-w-[1180px] md:mx-auto md:px-8">
+
+        {/* ── Testimonials — full bleed ── */}
+        <div className="max-w-[1180px] mx-auto md:px-8">
           <CommunitySection />
         </div>
-        
       </main>
     </PullToRefresh>
   );

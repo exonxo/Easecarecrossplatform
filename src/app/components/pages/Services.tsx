@@ -20,9 +20,6 @@ export function Services() {
           >
             <ArrowLeft size={18} className="text-[#334155]" />
           </button>
-          <h1 className="font-['Lexend',sans-serif] font-bold text-[18px] md:text-[20px] text-[#0f172a]">
-            All Services
-          </h1>
         </div>
       </div>
 

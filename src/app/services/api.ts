@@ -19,9 +19,13 @@ function lsSet(key: string, value: unknown): void {
   localStorage.setItem(key, JSON.stringify(value));
 }
 
-/** Always reachable in local mode */
+/**
+ * Returns false when the browser reports it is offline.
+ * In local/demo mode all "API" calls are localStorage operations,
+ * so the only real failure mode is the browser being offline.
+ */
 export function isApiReachable(): boolean {
-  return true;
+  return typeof navigator === "undefined" || navigator.onLine !== false;
 }
 
 /** No-op warmup */

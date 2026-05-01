@@ -250,7 +250,7 @@ export function ProfilePage() {
     clearBooking();
     try { localStorage.removeItem(COMPLETED_GIGS_KEY); } catch { /* noop */ }
     logout();
-    navigate("/onboarding", { replace: true });
+    navigate("/", { replace: true });
   };
 
   // Load profile from Supabase on mount
@@ -300,14 +300,6 @@ export function ProfilePage() {
     <>
       <main className="flex-1 pb-[100px] md:pb-8">
         <div className="max-w-[1180px] mx-auto px-4 md:px-8 pt-6 md:pt-8 pb-4">
-          {/* Page Title — mobile only */}
-          <div className="md:hidden flex items-center justify-between mb-6">
-            <h1 className="font-['Inter',sans-serif] font-bold text-[30px] text-[#111827]">
-              My Profile
-            </h1>
-            
-          </div>
-
           {/* Desktop two-column / Mobile single-column */}
           <div className="flex flex-col lg:flex-row gap-6 lg:gap-8">
             {/* ─── Left Column: Profile Card ─── */}
