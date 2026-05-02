@@ -10,7 +10,13 @@ import {
   Loader2,
   X,
   CalendarCheck,
+  ShieldCheck,
+  MousePointerClick,
+  BadgeCheck,
+  CheckCircle2,
+  Settings2,
 } from "lucide-react";
+import { Dialog, DialogContent, DialogTitle } from "../ui/dialog";
 import { ImageWithFallback } from "../figma/ImageWithFallback";
 import { PullToRefresh } from "./PullToRefresh";
 import {
@@ -149,6 +155,17 @@ const ICON_COLORS = [
   { bg: "#faf5ff", color: "#C084FC" },
   { bg: "#fef3c7", color: "#F59E0B" },
   { bg: "#ccfbf1", color: "#0D9488" },
+];
+
+// ─── Mock bidder pool for detail panel ───────────────────────────────────────
+
+const BIDDER_POOL = [
+  { name: "Anjali Sharma",  photo: "https://images.unsplash.com/photo-1710425804836-a1de39056b40?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=200", rating: 4.9, agency: "CareFirst Agency",   exp: "5 yrs", bid: "₹120/hr", verified: true  },
+  { name: "Priya Dasgupta", photo: "https://images.unsplash.com/photo-1590905707155-17c680dd7867?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=200", rating: 4.8, agency: "Bright Care",         exp: "3 yrs", bid: "₹115/hr", verified: true  },
+  { name: "Rekha Nair",     photo: "https://images.unsplash.com/photo-1667382137969-a11fd256717d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=200", rating: 4.7, agency: "HomeCare Plus",       exp: "4 yrs", bid: "₹125/hr", verified: true  },
+  { name: "Meena Pillai",   photo: "https://images.unsplash.com/photo-1698465281093-9f09159733b9?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=200", rating: 4.6, agency: "Sunshine Care",       exp: "2 yrs", bid: "₹110/hr", verified: false },
+  { name: "Sunita Roy",     photo: "https://images.unsplash.com/photo-1704927768421-bc9549b5097d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=200", rating: 4.5, agency: "NurtureCare",         exp: "6 yrs", bid: "₹130/hr", verified: true  },
+  { name: "Kavitha Das",    photo: "https://images.unsplash.com/photo-1717964028300-f2861ae1bf8a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=200", rating: 4.4, agency: "Premier Caregivers",  exp: "3 yrs", bid: "₹105/hr", verified: false },
 ];
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -377,6 +394,430 @@ function RequestDetailPanel({
   );
 }
 
+// ─── Left panel compact cards ────────────────────────────────────────────────
+
+function CompactReqCard({ req, selected, onClick }: { req: ActiveRequest; selected: boolean; onClick: () => void }) {
+  return (
+    <button
+      onClick={onClick}
+      className={`w-full flex items-center gap-3 px-4 py-3.5 border-b border-[#f1f5f9] text-left transition-all relative ${
+        selected
+          ? "bg-[#EBF3FC]"
+          : "hover:bg-[#f8fafc]"
+      }`}
+    >
+      {selected && <div className="absolute left-0 top-0 bottom-0 w-[3px] bg-[#1975D2] rounded-r-full" />}
+      <ServiceIcon bg={req.iconBg} color={req.iconColor} />
+      <div className="flex-1 min-w-0">
+        <div className="flex items-center justify-between gap-2">
+          <span className="font-['Lexend',sans-serif] font-bold text-[13px] text-[#0f172a] truncate">{req.service}</span>
+          <StatusBadge status={req.status} />
+        </div>
+        <p className="font-['Inter',sans-serif] text-[11px] text-[#94a3b8] mt-0.5">{req.reqId} · {req.postedAgo}</p>
+        <p className="font-['Inter',sans-serif] text-[11px] text-[#1975D2] font-semibold mt-0.5">{req.offerCount} offer{req.offerCount !== 1 ? "s" : ""} received</p>
+      </div>
+    </button>
+  );
+}
+
+function CompactHistoryCard({ booking, selected, onClick }: { booking: HistoryBooking; selected: boolean; onClick: () => void }) {
+  return (
+    <button
+      onClick={onClick}
+      className={`w-full flex items-center gap-3 px-4 py-3.5 border-b border-[#f1f5f9] text-left transition-all relative ${
+        selected ? "bg-[#EBF3FC]" : "hover:bg-[#f8fafc]"
+      }`}
+    >
+      {selected && <div className="absolute left-0 top-0 bottom-0 w-[3px] bg-[#1975D2] rounded-r-full" />}
+      <div className="size-10 rounded-full overflow-hidden border border-[#f1f5f9] shrink-0">
+        <ImageWithFallback src={booking.providerPhoto} alt={booking.providerName} className="size-full object-cover" />
+      </div>
+      <div className="flex-1 min-w-0">
+        <p className="font-['Lexend',sans-serif] font-bold text-[13px] text-[#0f172a] truncate">{booking.providerName}</p>
+        <p className="font-['Inter',sans-serif] text-[11px] text-[#64748b] truncate">{booking.service}</p>
+        <div className="flex items-center gap-1 mt-0.5">
+          <Star size={10} className="text-[#facc15] fill-[#facc15]" />
+          <span className="font-['Inter',sans-serif] text-[11px] text-[#374151] font-medium">{booking.rating}</span>
+          <span className="font-['Inter',sans-serif] text-[10px] text-[#94a3b8]">· {booking.date}</span>
+        </div>
+      </div>
+    </button>
+  );
+}
+
+// ─── Right panel: empty state ─────────────────────────────────────────────────
+
+function EmptySelectionPanel({ tab }: { tab: "requests" | "history" }) {
+  return (
+    <div className="h-full flex flex-col items-center justify-center text-center px-10 gap-4">
+      <div className="size-16 rounded-full bg-[#f1f5f9] flex items-center justify-center">
+        <MousePointerClick size={26} className="text-[#94a3b8]" />
+      </div>
+      <div>
+        <h3 className="font-['Lexend',sans-serif] font-bold text-[16px] text-[#0f172a] mb-1">
+          {tab === "requests" ? "Select a request" : "Select a booking"}
+        </h3>
+        <p className="font-['Inter',sans-serif] text-[13px] text-[#94a3b8] leading-[20px]">
+          Click any item on the left to view its full details here.
+        </p>
+      </div>
+    </div>
+  );
+}
+
+// ─── Payment Summary Modal ────────────────────────────────────────────────────
+
+function PaymentSummaryModal({
+  open,
+  onOpenChange,
+  bidder,
+  req,
+}: {
+  open: boolean;
+  onOpenChange: (v: boolean) => void;
+  bidder: (typeof BIDDER_POOL)[0] | null;
+  req: ActiveRequest;
+}) {
+  if (!bidder) return null;
+
+  const rateStr = bidder.bid.replace(/[₹\/hr\s]/g, "");
+  const rate = parseInt(rateStr) || 120;
+  const hoursMap: Record<string, number> = { "2-4 hrs": 3, "4-8 hrs": 6, "8-12 hrs": 10, "Full day": 12, "12hr Shift": 12, "Afternoon": 4, "3–4 hrs": 3.5 };
+  const hours = hoursMap[req.shift] ?? 4;
+  const subtotal = Math.round(rate * hours);
+  const platformFee = Math.round(subtotal * 0.08);
+  const total = subtotal + platformFee;
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="sm:max-w-[440px] w-[95vw] p-0 gap-0 overflow-hidden">
+        <DialogTitle className="sr-only">Order Summary</DialogTitle>
+
+        {/* Header */}
+        <div className="px-5 py-4 border-b border-[#f1f5f9] flex items-center gap-3">
+          <div className="size-8 rounded-full bg-[#EBF3FC] flex items-center justify-center shrink-0">
+            <CheckCircle2 size={15} className="text-[#1975D2]" />
+          </div>
+          <div>
+            <p className="font-['Lexend',sans-serif] font-bold text-[16px] text-[#0f172a]">Order Summary</p>
+            <p className="font-['Inter',sans-serif] text-[12px] text-[#94a3b8]">Review before confirming</p>
+          </div>
+        </div>
+
+        <div className="px-5 py-5 flex flex-col gap-4">
+          {/* Provider card */}
+          <div className="flex items-center gap-3 bg-[#f8fafc] rounded-[12px] p-3 border border-[#f1f5f9]">
+            <div className="relative shrink-0">
+              <div className="size-11 rounded-full overflow-hidden border border-[#e2e8f0]">
+                <ImageWithFallback src={bidder.photo} alt={bidder.name} className="size-full object-cover" />
+              </div>
+              {bidder.verified && (
+                <div className="absolute -bottom-0.5 -right-0.5 size-4 rounded-full bg-[#3b82f6] border-[1.5px] border-white flex items-center justify-center">
+                  <ShieldCheck size={8} className="text-white" strokeWidth={2.5} />
+                </div>
+              )}
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="font-['Lexend',sans-serif] font-semibold text-[14px] text-[#0f172a]">{bidder.name}</p>
+              <p className="font-['Inter',sans-serif] text-[11px] text-[#94a3b8]">{bidder.agency}</p>
+              <div className="flex items-center gap-1 mt-0.5">
+                <Star size={10} className="text-[#facc15] fill-[#facc15]" />
+                <span className="font-['Inter',sans-serif] text-[11px] text-[#374151] font-semibold">{bidder.rating}</span>
+                <span className="font-['Inter',sans-serif] text-[10px] text-[#94a3b8]">· {bidder.exp} exp</span>
+              </div>
+            </div>
+            <span className="font-['Lexend',sans-serif] font-bold text-[15px] text-[#1975D2]">{bidder.bid}</span>
+          </div>
+
+          {/* Service details */}
+          <div className="flex flex-col gap-2.5">
+            <div className="flex justify-between items-center">
+              <span className="font-['Inter',sans-serif] text-[13px] text-[#64748b]">Service</span>
+              <span className="font-['Inter',sans-serif] font-medium text-[13px] text-[#0f172a]">{req.service}</span>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="font-['Inter',sans-serif] text-[13px] text-[#64748b]">Duration</span>
+              <span className="font-['Inter',sans-serif] font-medium text-[13px] text-[#0f172a]">{req.shift}</span>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="font-['Inter',sans-serif] text-[13px] text-[#64748b]">Hourly rate</span>
+              <span className="font-['Inter',sans-serif] font-medium text-[13px] text-[#0f172a]">₹{rate}/hr</span>
+            </div>
+          </div>
+
+          {/* Price breakdown */}
+          <div className="bg-[#f8fafc] rounded-[12px] p-3.5 border border-[#f1f5f9] flex flex-col gap-2">
+            <div className="flex justify-between items-center">
+              <span className="font-['Inter',sans-serif] text-[13px] text-[#64748b]">Subtotal ({hours}h × ₹{rate})</span>
+              <span className="font-['Inter',sans-serif] font-medium text-[13px] text-[#0f172a]">₹{subtotal}</span>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="font-['Inter',sans-serif] text-[13px] text-[#64748b]">Platform fee (8%)</span>
+              <span className="font-['Inter',sans-serif] font-medium text-[13px] text-[#0f172a]">₹{platformFee}</span>
+            </div>
+            <div className="border-t border-[#e2e8f0] pt-2 flex justify-between items-center">
+              <span className="font-['Lexend',sans-serif] font-bold text-[14px] text-[#0f172a]">Total</span>
+              <span className="font-['Lexend',sans-serif] font-extrabold text-[18px] text-[#1975D2]">₹{total}</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Footer */}
+        <div className="px-5 py-4 border-t border-[#f1f5f9] flex gap-3">
+          <button
+            onClick={() => onOpenChange(false)}
+            className="flex-1 py-2.5 rounded-[10px] border border-[#e5e7eb] font-['Inter',sans-serif] font-medium text-[14px] text-[#374151] hover:bg-[#f9fafb] transition-colors cursor-pointer"
+          >
+            Cancel
+          </button>
+          <button
+            onClick={() => onOpenChange(false)}
+            className="flex-[2] py-2.5 rounded-[10px] bg-[#1975D2] font-['Lexend',sans-serif] font-semibold text-[14px] text-white hover:bg-[#1565b8] active:scale-[0.98] transition-all cursor-pointer"
+          >
+            Proceed to Pay →
+          </button>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+// ─── Right panel: active request detail ──────────────────────────────────────
+
+function RequestRightPanel({ req }: { req: ActiveRequest }) {
+  const navigate = useNavigate();
+  const bidders = BIDDER_POOL.slice(0, Math.min(req.offerCount, BIDDER_POOL.length));
+  const [payBidder, setPayBidder] = useState<(typeof BIDDER_POOL)[0] | null>(null);
+
+  return (
+    <div className="h-full overflow-y-auto">
+      {/* Compact header */}
+      <div className="bg-white border-b border-[#f1f5f9] px-6 pt-5 pb-4">
+        {/* Service identity row */}
+        <div className="flex items-center gap-3 mb-3">
+          <div
+            className="size-12 rounded-[14px] flex items-center justify-center shrink-0"
+            style={{ backgroundColor: req.iconBg }}
+          >
+            <svg width={22} height={22} viewBox="0 0 17.5195 26.8945" fill="none">
+              <path d={svgPaths.p39428e98 || svgPaths.p17c09480} fill={req.iconColor} />
+            </svg>
+          </div>
+          <div className="flex-1 min-w-0">
+            <h1 className="font-['Lexend',sans-serif] font-extrabold text-[20px] text-[#0f172a] leading-[26px]">{req.service}</h1>
+            <div className="flex items-center gap-2 mt-0.5">
+              <p className="font-['Inter',sans-serif] text-[12px] text-[#94a3b8]">{req.reqId} · posted {req.postedAgo}</p>
+              <StatusBadge status={req.status} />
+            </div>
+          </div>
+        </div>
+
+        {/* Compact stats row */}
+        <div className="flex items-center gap-2 mb-3">
+          {[
+            { label: "Shift", value: req.shift, Icon: Clock },
+            { label: "Budget", value: req.budget, Icon: Wallet },
+            { label: "Offers", value: `${req.offerCount} bids`, Icon: ChevronRight },
+          ].map(({ label, value, Icon }) => (
+            <div key={label} className="flex items-center gap-1.5 bg-[#f8fafc] rounded-[8px] px-3 py-1.5 border border-[#f1f5f9]">
+              <Icon size={11} className="text-[#1975D2] shrink-0" />
+              <span className="font-['Inter',sans-serif] text-[11px] text-[#94a3b8]">{label}:</span>
+              <span className="font-['Lexend',sans-serif] font-semibold text-[12px] text-[#0f172a]">{value}</span>
+            </div>
+          ))}
+        </div>
+
+        {/* Action buttons just below stats */}
+        <div className="flex gap-2">
+          <button className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-[8px] border border-[#e5e7eb] font-['Inter',sans-serif] font-medium text-[12px] text-[#374151] hover:bg-[#f9fafb] transition-colors cursor-pointer">
+            <Settings2 size={12} className="text-[#64748b]" />
+            Manage Request
+          </button>
+          <button
+            onClick={() => navigate(`/bookings/${req.id}/bids`)}
+            className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-[8px] bg-[#1975D2] font-['Inter',sans-serif] font-medium text-[12px] text-white hover:bg-[#1565b8] transition-colors cursor-pointer"
+          >
+            <ChevronRight size={12} />
+            View All Bids
+          </button>
+        </div>
+      </div>
+
+      {/* Bidders list */}
+      <div className="px-6 py-4">
+        <h3 className="font-['Lexend',sans-serif] font-bold text-[15px] text-[#0f172a] mb-3">
+          Offers Received
+          <span className="ml-2 bg-[#EBF3FC] text-[#1975D2] text-[11px] font-semibold px-2 py-0.5 rounded-full">{req.offerCount}</span>
+        </h3>
+
+        <div className="bg-white rounded-[14px] border border-[#f1f5f9] overflow-hidden">
+          {bidders.map((b, i) => (
+            <motion.div
+              key={b.name}
+              initial={{ opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: i * 0.04 }}
+              className="flex items-center gap-3 px-4 py-3.5 border-b border-[#f8fafc] last:border-0 hover:bg-[#fafbfc] transition-colors"
+            >
+              {/* Avatar */}
+              <div className="relative shrink-0">
+                <div className="size-10 rounded-full overflow-hidden border border-[#f1f5f9]">
+                  <ImageWithFallback src={b.photo} alt={b.name} className="size-full object-cover" />
+                </div>
+                {b.verified && (
+                  <div className="absolute -bottom-0.5 -right-0.5 size-4 rounded-full bg-[#3b82f6] border-[1.5px] border-white flex items-center justify-center">
+                    <ShieldCheck size={8} className="text-white" strokeWidth={2.5} />
+                  </div>
+                )}
+              </div>
+
+              {/* Info */}
+              <div className="flex-1 min-w-0">
+                <p className="font-['Lexend',sans-serif] font-semibold text-[13px] text-[#0f172a]">{b.name}</p>
+                <div className="flex items-center gap-1.5 mt-0.5">
+                  <Star size={10} className="text-[#facc15] fill-[#facc15]" />
+                  <span className="font-['Inter',sans-serif] text-[11px] text-[#374151] font-semibold">{b.rating}</span>
+                  <span className="font-['Inter',sans-serif] text-[11px] text-[#94a3b8]">· {b.exp} · {b.agency}</span>
+                </div>
+              </div>
+
+              {/* Bid + Accept */}
+              <div className="flex items-center gap-3 shrink-0">
+                <span className="font-['Lexend',sans-serif] font-bold text-[14px] text-[#1975D2]">{b.bid}</span>
+                <button
+                  onClick={() => setPayBidder(b)}
+                  className="px-3.5 py-1.5 rounded-[8px] bg-[#f0fdf4] border border-[#bbf7d0] text-[#16a34a] font-['Inter',sans-serif] font-semibold text-[12px] hover:bg-[#dcfce7] transition-colors cursor-pointer whitespace-nowrap"
+                >
+                  Accept
+                </button>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      </div>
+
+      <PaymentSummaryModal
+        open={!!payBidder}
+        onOpenChange={(v) => { if (!v) setPayBidder(null); }}
+        bidder={payBidder}
+        req={req}
+      />
+    </div>
+  );
+}
+
+// ─── Right panel: history detail ──────────────────────────────────────────────
+
+function HistoryRightPanel({
+  booking,
+  onReportIssue,
+  onRate,
+}: {
+  booking: HistoryBooking;
+  onReportIssue: (b: HistoryBooking) => void;
+  onRate: (id: string, v: number) => void;
+}) {
+  const [rating, setRating] = useState(booking.userRating ?? 0);
+  const [rated, setRated] = useState(!!booking.userRating);
+
+  const handleRate = (v: number) => { setRating(v); setRated(true); onRate(booking.id, v); };
+
+  return (
+    <div className="h-full overflow-y-auto">
+      {/* Provider hero */}
+      <div className="bg-white border-b border-[#f1f5f9] px-8 pt-10 pb-8 flex flex-col items-center text-center">
+        <div className="relative mb-4">
+          <div className="size-24 rounded-full overflow-hidden border-[3px] border-white shadow-[0_4px_20px_rgba(0,0,0,0.12)]">
+            <ImageWithFallback src={booking.providerPhoto} alt={booking.providerName} className="size-full object-cover" />
+          </div>
+          {booking.verified && (
+            <div className="absolute bottom-0 right-0 size-7 rounded-full bg-[#3b82f6] border-[2px] border-white flex items-center justify-center">
+              <BadgeCheck size={14} className="text-white" />
+            </div>
+          )}
+        </div>
+        <h2 className="font-['Lexend',sans-serif] font-extrabold text-[22px] text-[#0f172a] mb-0.5">{booking.providerName}</h2>
+        <p className="font-['Inter',sans-serif] text-[14px] text-[#64748b]">{booking.service}</p>
+        <p className="font-['Inter',sans-serif] text-[12px] text-[#94a3b8]">{booking.agency}</p>
+        <div className="flex items-center gap-1.5 mt-2">
+          {[1,2,3,4,5].map((s) => (
+            <Star key={s} size={16} className={s <= Math.round(booking.rating) ? "text-[#facc15] fill-[#facc15]" : "text-[#e2e8f0]"} />
+          ))}
+          <span className="font-['Inter',sans-serif] font-semibold text-[13px] text-[#374151] ml-1">{booking.rating}</span>
+        </div>
+      </div>
+
+      <div className="px-8 py-6 flex flex-col gap-4">
+        {/* Meta */}
+        <div className="bg-white rounded-[14px] border border-[#f1f5f9] p-4 flex flex-col gap-3">
+          <div className="flex justify-between">
+            <span className="font-['Inter',sans-serif] text-[13px] text-[#64748b]">Booking date</span>
+            <span className="font-['Inter',sans-serif] text-[13px] font-semibold text-[#0f172a]">{booking.date}</span>
+          </div>
+          <div className="flex justify-between">
+            <span className="font-['Inter',sans-serif] text-[13px] text-[#64748b]">Service</span>
+            <span className="font-['Inter',sans-serif] text-[13px] font-semibold text-[#0f172a]">{booking.service}</span>
+          </div>
+          <div className="flex justify-between">
+            <span className="font-['Inter',sans-serif] text-[13px] text-[#64748b]">Agency</span>
+            <span className="font-['Inter',sans-serif] text-[13px] font-semibold text-[#0f172a]">{booking.agency}</span>
+          </div>
+        </div>
+
+        {/* Rating */}
+        <div className="bg-white rounded-[14px] border border-[#f1f5f9] p-4">
+          {rated ? (
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <div className="flex gap-0.5">
+                  {[1,2,3,4,5].map((s) => (
+                    <Star key={s} size={16} className={s <= rating ? "text-[#facc15] fill-[#facc15]" : "text-[#e2e8f0]"} />
+                  ))}
+                </div>
+                <span className="font-['Inter',sans-serif] text-[12px] text-[#64748b]">Your rating</span>
+              </div>
+              <button onClick={() => setRated(false)} className="text-[11px] text-[#1975D2] hover:underline cursor-pointer font-['Inter']">Edit</button>
+            </div>
+          ) : (
+            <div className="flex flex-col gap-2.5">
+              <p className="font-['Inter',sans-serif] font-semibold text-[13px] text-[#0f172a]">Rate this booking</p>
+              <div className="flex items-center gap-2">
+                <StarRatingWidget value={rating} onChange={handleRate} />
+                {rating > 0 && <span className="text-[12px] text-[#64748b] font-['Inter']">{["", "Poor", "Fair", "Good", "Great", "Excellent"][rating]}</span>}
+              </div>
+            </div>
+          )}
+        </div>
+
+        <button
+          onClick={() => onReportIssue(booking)}
+          className="w-full py-3 rounded-[12px] border border-[#fecaca] bg-[#fff5f5] text-[#dc2626] font-['Inter',sans-serif] font-semibold text-[14px] hover:bg-[#fee2e2] transition-colors cursor-pointer"
+        >
+          Report an Issue
+        </button>
+      </div>
+    </div>
+  );
+}
+
+// ─── Star Rating Widget (reused) ──────────────────────────────────────────────
+
+function StarRatingWidget({ value, onChange }: { value: number; onChange: (v: number) => void }) {
+  const [hovered, setHovered] = useState(0);
+  return (
+    <div className="flex items-center gap-0.5">
+      {[1,2,3,4,5].map((s) => (
+        <button key={s} onClick={(e) => { e.stopPropagation(); onChange(s); }}
+          onMouseEnter={() => setHovered(s)} onMouseLeave={() => setHovered(0)}
+          className="cursor-pointer transition-transform hover:scale-110"
+        >
+          <Star size={20} className={s <= (hovered || value) ? "text-[#facc15] fill-[#facc15]" : "text-[#d1d5db]"} />
+        </button>
+      ))}
+    </div>
+  );
+}
+
 // ─── Star Rating Widget ───────────────────────────────────────────────────────
 
 function StarRating({
@@ -587,6 +1028,7 @@ function SectionHeader({ title, count }: { title: string; count: number }) {
 export function BookingsPage() {
   const [activeTab, setActiveTab] = useState<"requests" | "history">("requests");
   const [selectedReqId, setSelectedReqId] = useState<string | null>(null);
+  const [selectedHistoryId, setSelectedHistoryId] = useState<string | null>(null);
 
   // ── Server data ──
   const [serverBookings, setServerBookings] = useState<BookingRecord[]>([]);
@@ -727,18 +1169,17 @@ export function BookingsPage() {
   };
 
   return (
-    <div className="flex flex-col flex-1">
+    <div className="flex flex-col lg:h-[calc(100vh-64px)] lg:overflow-hidden">
 
-      {/* ── Subheader — outside PullToRefresh so it's in the real document flow.
-           sticky top-[64px] correctly clears TopNav here (no overflow-y-auto ancestor). ── */}
-      <div className="sticky top-[64px] z-10 bg-white border-b border-[#f1f5f9] shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
+      {/* ── Subheader — sticky within the fixed-height desktop container ── */}
+      <div className="sticky top-0 lg:top-0 z-10 bg-white border-b border-[#f1f5f9] shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
         {/* Pill segmented control */}
         <div className="px-4 md:px-8 py-3 flex items-center justify-between gap-3">
           <div className="inline-flex bg-[#f1f5f9] rounded-full p-1 gap-1">
             {(["requests", "history"] as const).map((tab) => (
               <button
                 key={tab}
-                onClick={() => { setActiveTab(tab); setSelectedReqId(null); }}
+                onClick={() => { setActiveTab(tab); setSelectedReqId(null); setSelectedHistoryId(null); }}
                 className={`relative px-4 py-1.5 rounded-full font-['Inter',sans-serif] text-[13px] font-medium transition-all duration-200 cursor-pointer whitespace-nowrap ${
                   activeTab === tab
                     ? "bg-white text-[#0f172a] shadow-[0_1px_4px_rgba(0,0,0,0.12)] font-semibold"
@@ -769,91 +1210,113 @@ export function BookingsPage() {
         </div>
       </div>
 
-      {/* ── Scrollable content inside PullToRefresh ── */}
-      <PullToRefresh>
-        <main className="pb-[80px] lg:pb-8">
-          <div className="px-4 md:px-8 pt-6 pb-4">
-            <AnimatePresence mode="wait">
+      {/* ── DESKTOP: 30/70 split layout ── */}
+      <div className="hidden lg:flex flex-1 min-h-0 overflow-hidden">
 
-              {/* REQUESTS TAB */}
-              {activeTab === "requests" && (
-                <motion.div
-                  key="requests"
-                  initial={{ opacity: 0, y: 6 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -6 }}
-                  transition={{ duration: 0.18 }}
-                >
+        {/* Left 30% — compact card list */}
+        <div className="w-[30%] shrink-0 border-r border-[#f1f5f9] bg-white overflow-y-auto">
+          <AnimatePresence mode="wait">
+            {activeTab === "requests" ? (
+              <motion.div key="req-list" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+                {allRequests.length === 0 && !loading ? (
+                  <div className="p-6 text-center">
+                    <p className="font-['Inter',sans-serif] text-[13px] text-[#94a3b8]">No active requests</p>
+                  </div>
+                ) : (
+                  allRequests.map((req) => (
+                    <CompactReqCard
+                      key={req.id}
+                      req={req}
+                      selected={selectedReqId === req.id}
+                      onClick={() => setSelectedReqId(req.id)}
+                    />
+                  ))
+                )}
+              </motion.div>
+            ) : (
+              <motion.div key="hist-list" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+                {allHistory.length === 0 && !loading ? (
+                  <div className="p-6 text-center">
+                    <p className="font-['Inter',sans-serif] text-[13px] text-[#94a3b8]">No history yet</p>
+                  </div>
+                ) : (
+                  allHistory.map((b) => (
+                    <CompactHistoryCard
+                      key={b.id}
+                      booking={b}
+                      selected={selectedHistoryId === b.id}
+                      onClick={() => setSelectedHistoryId(b.id)}
+                    />
+                  ))
+                )}
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+
+        {/* Right 70% — detail panel */}
+        <div className="flex-1 bg-[#f8fafc] overflow-y-auto">
+          <AnimatePresence mode="wait">
+            {activeTab === "requests" && selectedReq ? (
+              <motion.div key={selectedReq.id} initial={{ opacity: 0, x: 16 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }} className="h-full">
+                <RequestRightPanel req={selectedReq} />
+              </motion.div>
+            ) : activeTab === "history" && selectedHistoryId ? (
+              <motion.div key={selectedHistoryId} initial={{ opacity: 0, x: 16 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }} className="h-full">
+                <HistoryRightPanel
+                  booking={allHistory.find((b) => b.id === selectedHistoryId)!}
+                  onReportIssue={handleReportIssue}
+                  onRate={handleRate}
+                />
+              </motion.div>
+            ) : (
+              <motion.div key="empty" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="h-full">
+                <EmptySelectionPanel tab={activeTab} />
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+      </div>
+
+      {/* ── MOBILE: single column with PullToRefresh ── */}
+      <div className="lg:hidden flex-1">
+      <PullToRefresh>
+        <main className="lg:hidden pb-[80px]">
+          <div className="px-4 pt-4 pb-4">
+            <AnimatePresence mode="wait">
+              {activeTab === "requests" ? (
+                <motion.div key="mob-req" initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6 }} transition={{ duration: 0.18 }}>
                   {allRequests.length === 0 && !loading ? (
                     <EmptyState type="requests" />
                   ) : (
-                    <div className="flex gap-6 items-start">
-                      <div className="flex-1 min-w-0">
-                        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-                          {allRequests.map((req) => (
-                            <ActiveRequestCard
-                              key={req.id}
-                              req={req}
-                              selected={selectedReqId === req.id}
-                              onClick={() =>
-                                setSelectedReqId(selectedReqId === req.id ? null : req.id)
-                              }
-                            />
-                          ))}
-                        </div>
-                      </div>
-                      <AnimatePresence>
-                        {selectedReq && (
-                          <div className="hidden lg:block w-[340px] xl:w-[380px] shrink-0">
-                            <RequestDetailPanel
-                              req={selectedReq}
-                              onClose={() => setSelectedReqId(null)}
-                            />
-                          </div>
-                        )}
-                      </AnimatePresence>
+                    <div className="flex flex-col gap-3">
+                      {allRequests.map((req) => (
+                        <ActiveRequestCard key={req.id} req={req} selected={false} onClick={() => {}} />
+                      ))}
                     </div>
                   )}
                 </motion.div>
-              )}
-
-              {/* HISTORY TAB */}
-              {activeTab === "history" && (
-                <motion.div
-                  key="history"
-                  initial={{ opacity: 0, y: 6 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -6 }}
-                  transition={{ duration: 0.18 }}
-                >
+              ) : (
+                <motion.div key="mob-hist" initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6 }} transition={{ duration: 0.18 }}>
                   {allHistory.length === 0 && !loading ? (
                     <EmptyState type="history" />
                   ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+                    <div className="flex flex-col gap-3">
                       {allHistory.map((booking) => (
-                        <HistoryCard
-                          key={booking.id}
-                          booking={booking}
-                          onReportIssue={handleReportIssue}
-                          onRate={handleRate}
-                        />
+                        <HistoryCard key={booking.id} booking={booking} onReportIssue={handleReportIssue} onRate={handleRate} />
                       ))}
                     </div>
                   )}
                 </motion.div>
               )}
-
             </AnimatePresence>
           </div>
-
           {submittedTicket && activeTab === "history" && !showSupportChat && (
-            <StickyTicketCard
-              ticket={submittedTicket}
-              onOpenChat={() => setShowSupportChat(true)}
-            />
+            <StickyTicketCard ticket={submittedTicket} onOpenChat={() => setShowSupportChat(true)} />
           )}
         </main>
       </PullToRefresh>
+      </div>
 
       <AnimatePresence>
         {showIssueModal && reportingBooking && (

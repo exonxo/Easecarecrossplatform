@@ -1,9 +1,7 @@
 import { PullToRefresh } from "../layout/PullToRefresh";
-import { HeroBanner } from "./HeroBanner";
-import { CompactHero } from "./CompactHero";
+import { PromoSection } from "./PromoSection";
 import { QuickCategories } from "./QuickCategories";
 import { FeaturedCategory } from "./FeaturedCategory";
-import { PostRequirementStrip } from "./PostRequirementStrip";
 import { CarePackages } from "./CarePackages";
 import { CommunitySection } from "./CommunitySection";
 
@@ -13,17 +11,11 @@ export function HomePage() {
       <main className="flex-1 pb-[100px] md:pb-0">
         <div className="w-full min-w-0 max-w-[1180px] mx-auto px-4 md:px-8 pt-5 md:pt-7 pb-6 flex flex-col gap-8 md:gap-10">
 
-          {/* ── Search + greeting ── */}
-          <CompactHero />
-
-          {/* ── Post Requirement action strip ── */}
-          <PostRequirementStrip />
+          {/* ── Hero: shortcuts + promo banners ── */}
+          <PromoSection />
 
           {/* ── All 8 category shortcuts (UC-style grid) ── */}
           <QuickCategories />
-
-          {/* ── Promotional banners ── */}
-          <HeroBanner />
 
           {/* ── Elder Care — expanded inline (priority category) ── */}
           <FeaturedCategory categoryLabel="Elder Care" />

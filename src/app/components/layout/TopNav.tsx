@@ -1,70 +1,55 @@
 import { useState } from "react";
-import { useLocation, useNavigate } from "react-router";
-import { Home, CalendarCheck, User, Search, MapPin, ChevronDown } from "lucide-react";
+import { useNavigate } from "react-router";
+import {
+  Search, MapPin, ChevronDown, User,
+  CalendarCheck, Settings, MapPinned,
+  HelpCircle, LogOut,
+} from "lucide-react";
 import { LogoFull } from "../shared/LogoFull";
 import { useAuth } from "../../context/AuthContext";
 import { LoginModal } from "../auth/LoginModal";
 import { SearchModal } from "./SearchModal";
 import { LocationModal } from "./LocationModal";
-
-const navItems = [
-  { icon: Home, label: "Home", path: "/" },
-  { icon: CalendarCheck, label: "Bookings", path: "/bookings" },
-  { icon: User, label: "Profile", path: "/profile" },
-];
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuLabel,
+} from "../ui/dropdown-menu";
 
 export function TopNav() {
-  const location = useLocation();
   const navigate = useNavigate();
-  const { user, profile } = useAuth();
+  const { user, profile, logout } = useAuth();
   const [loginOpen, setLoginOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [locationOpen, setLocationOpen] = useState(false);
 
   const isLoggedIn = !!(user && profile?.onboardingComplete);
+  const initials = profile?.name
+    ? profile.name.split(" ").map((w) => w[0]).slice(0, 2).join("").toUpperCase()
+    : null;
+
+  const handleLogout = () => {
+    logout();
+    navigate("/", { replace: true });
+  };
 
   return (
     <>
       <header className="sticky top-0 z-30 w-full bg-white border-b border-[#f1f5f9] shadow-[0_1px_4px_rgba(0,0,0,0.04)]">
         <div className="h-[64px] flex items-center justify-between px-4 md:px-8">
-          {/* Logo + Nav tabs grouped on the left */}
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => navigate("/")}
-              className="flex items-center cursor-pointer hover:opacity-80 transition-opacity"
-            >
-              <LogoFull size="small" />
-            </button>
 
-            {/* Divider */}
-            <div className="hidden md:block w-px h-5 bg-[#e2e8f0] mx-2" />
+          {/* Left — logo only */}
+          <button
+            onClick={() => navigate("/")}
+            className="flex items-center cursor-pointer hover:opacity-80 transition-opacity shrink-0"
+          >
+            <LogoFull size="small" />
+          </button>
 
-            {/* Nav tabs — desktop only */}
-            <nav className="hidden md:flex items-center gap-1">
-            {navItems.map((item) => {
-              const isActive = location.pathname === item.path;
-              return (
-                <button
-                  key={item.path}
-                  onClick={() => navigate(item.path)}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-[10px] transition-all cursor-pointer font-['Lexend',sans-serif] text-[14px] ${
-                    isActive
-                      ? "bg-[#EBF3FC] text-[#1975D2] font-bold"
-                      : "text-[#64748b] hover:bg-[#f8fafc] hover:text-[#334155] font-medium"
-                  }`}
-                >
-                  <item.icon
-                    size={17}
-                    strokeWidth={isActive ? 2.2 : 1.8}
-                  />
-                  {item.label}
-                </button>
-              );
-            })}
-          </nav>
-          </div>
-
-          {/* Right side */}
+          {/* Right — location + search + profile/login */}
           <div className="flex items-center gap-2">
             {isLoggedIn ? (
               <>
@@ -95,6 +80,65 @@ export function TopNav() {
                   <Search size={15} />
                   <span className="hidden md:inline">Search services...</span>
                 </button>
+
+                {/* Profile avatar + dropdown */}
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <button className="size-9 rounded-full bg-[#1975D2] text-white flex items-center justify-center font-['Lexend',sans-serif] font-bold text-[13px] hover:bg-[#1565b8] transition-colors cursor-pointer shrink-0 outline-none shadow-[0_0_0_2px_white,0_0_0_4px_rgba(25,117,210,0.35)]">
+                      {initials ?? <User size={16} strokeWidth={2} />}
+                    </button>
+                  </DropdownMenuTrigger>
+
+                  <DropdownMenuContent align="end" className="w-56 mt-1">
+                    {/* User info */}
+                    <DropdownMenuLabel className="font-normal">
+                      <div className="flex flex-col gap-0.5 py-1">
+                        <p className="font-['Lexend',sans-serif] font-semibold text-[14px] text-[#0f172a]">
+                          {profile?.name ?? "My Account"}
+                        </p>
+                        {profile?.email && (
+                          <p className="font-['Inter',sans-serif] text-[12px] text-[#94a3b8] truncate">
+                            {profile.email}
+                          </p>
+                        )}
+                      </div>
+                    </DropdownMenuLabel>
+
+                    <DropdownMenuSeparator />
+
+                    <DropdownMenuItem onClick={() => navigate("/bookings")} className="cursor-pointer">
+                      <CalendarCheck size={15} className="mr-2 text-[#64748b]" />
+                      <span>My Bookings</span>
+                    </DropdownMenuItem>
+
+                    <DropdownMenuItem onClick={() => navigate("/profile")} className="cursor-pointer">
+                      <Settings size={15} className="mr-2 text-[#64748b]" />
+                      <span>My Profile</span>
+                    </DropdownMenuItem>
+
+                    <DropdownMenuItem onClick={() => setLocationOpen(true)} className="cursor-pointer">
+                      <MapPinned size={15} className="mr-2 text-[#64748b]" />
+                      <span>Saved Addresses</span>
+                    </DropdownMenuItem>
+
+                    <DropdownMenuSeparator />
+
+                    <DropdownMenuItem onClick={() => navigate("/messages")} className="cursor-pointer">
+                      <HelpCircle size={15} className="mr-2 text-[#64748b]" />
+                      <span>Help & Support</span>
+                    </DropdownMenuItem>
+
+                    <DropdownMenuSeparator />
+
+                    <DropdownMenuItem
+                      onClick={handleLogout}
+                      className="cursor-pointer text-[#ef4444] focus:text-[#ef4444] focus:bg-[#fef2f2]"
+                    >
+                      <LogOut size={15} className="mr-2" />
+                      <span>Sign Out</span>
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </>
             ) : (
               <button
