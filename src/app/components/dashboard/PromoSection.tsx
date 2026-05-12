@@ -2,8 +2,8 @@ import { useState } from "react";
 import { useNavigate } from "react-router";
 import { motion } from "motion/react";
 import {
-  ChevronRight, Users, Sparkles, Heart, Utensils,
-  Star, Dumbbell, Shield, PawPrint,
+  ChevronRight, Users, Heart, Baby, HeartHandshake,
+  Dumbbell, Sparkles, ChefHat, PawPrint,
 } from "lucide-react";
 import { useRequireAuth } from "../../hooks/useRequireAuth";
 import { LoginModal } from "../auth/LoginModal";
@@ -12,14 +12,16 @@ import { PostRequirementModal } from "./PostRequirementModal";
 // ─── Service categories (matches Figma 2×4 grid exactly) ─────────────────────
 
 const CATEGORIES = [
-  { icon: Users,    label: "Elder Care",  color: "#2563EB", bg: "#EEF2FF", border: "rgba(219,234,254,0.6)" },
-  { icon: Sparkles, label: "Cleaning",    color: "#059669", bg: "#F1F5F9", border: "rgba(209,250,229,0.6)" },
-  { icon: Heart,    label: "Nursing",     color: "#E11D48", bg: "#EEF2FF", border: "rgba(243,232,255,0.6)" },
-  { icon: Utensils, label: "Cooking",     color: "#EA580C", bg: "#F1F5F9", border: "rgba(255,237,213,0.6)" },
-  { icon: Star,     label: "Baby Care",   color: "#9333EA", bg: "#FAF5FF", border: "rgba(243,232,255,0.6)" },
-  { icon: Dumbbell, label: "Physio",      color: "#4F46E5", bg: "#EEF2FF", border: "rgba(224,231,255,0.6)" },
-  { icon: Shield,   label: "Security",    color: "#64748B", bg: "#F1F5F9", border: "rgba(226,232,240,0.6)" },
-  { icon: PawPrint, label: "Pet Care",    color: "#D97706", bg: "#F1F5F9", border: "rgba(254,243,199,0.6)" },
+  // Row 1
+  { icon: Users,          label: "Elder Care",      color: "#2563EB", bg: "#EEF2FF", border: "rgba(219,234,254,0.6)" },
+  { icon: Heart,          label: "Home Nursing",    color: "#E11D48", bg: "#FFF1F2", border: "rgba(254,205,211,0.6)" },
+  { icon: Baby,           label: "Baby Care",       color: "#9333EA", bg: "#FAF5FF", border: "rgba(243,232,255,0.6)" },
+  { icon: HeartHandshake, label: "Companion Care",  color: "#0D9488", bg: "#F0FDFA", border: "rgba(204,251,241,0.6)" },
+  // Row 2
+  { icon: Dumbbell,       label: "Physiotherapy",   color: "#4F46E5", bg: "#EEF2FF", border: "rgba(224,231,255,0.6)" },
+  { icon: Sparkles,       label: "Housekeeping",    color: "#059669", bg: "#ECFDF5", border: "rgba(209,250,229,0.6)" },
+  { icon: ChefHat,        label: "Personal Chef",   color: "#EA580C", bg: "#FFF7ED", border: "rgba(255,237,213,0.6)" },
+  { icon: PawPrint,       label: "Pet Care",        color: "#D97706", bg: "#FFFBEB", border: "rgba(254,243,199,0.6)" },
 ];
 
 // ─── Checkmark icon for bullet points ────────────────────────────────────────
@@ -115,7 +117,7 @@ export function PromoSection() {
             <p className="font-['Inter',sans-serif] text-[13px] text-[#64748b] text-center">
               Got a special request?{" "}
               <button onClick={handlePostRequirement} className="text-[#1975D2] font-medium cursor-pointer hover:underline">
-                Tell us what you need →
+                Book a Verified Caregiver →
               </button>
             </p>
           </div>
@@ -187,7 +189,7 @@ export function PromoSection() {
           <p className="font-['Inter',sans-serif] text-[12px] text-[#64748b] text-center">
             Got a special request?{" "}
             <button onClick={handlePostRequirement} className="text-[#1975D2] font-medium cursor-pointer hover:underline">
-              Tell us what you need →
+              Book a Verified Caregiver →
             </button>
           </p>
         </div>

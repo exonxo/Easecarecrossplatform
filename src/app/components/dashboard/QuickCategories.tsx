@@ -216,14 +216,16 @@ const DEFAULT_SERVICES: ServiceItem[] = [
 // ─── Category definitions ─────────────────────────────────────────────────────
 
 export const categories: Category[] = [
-  { label: "Elder Care",  icon: svgPaths.p3f3a9b80,  viewBox: "0 0 28 27.3333",   iconW: 28,     iconH: 27.333, color: "#2563EB", bg: "#eff6ff", border: "rgba(219,234,254,0.6)" },
-  { label: "Cleaning",   icon: svgPaths.p3eb40d60,  viewBox: "0 0 24 29.3333",   iconW: 24,     iconH: 29.333, color: "#059669", bg: "#ecfdf5", border: "rgba(209,250,229,0.6)" },
-  { label: "Nursing",    icon: svgPaths.p23d8d00,   viewBox: "0 0 26.6667 26.6667", iconW: 26.667, iconH: 26.667, color: "#E11D48", bg: "#fff1f2", border: "rgba(255,228,230,0.6)" },
-  { label: "Cooking",    icon: svgPaths.p3dfaed00,  viewBox: "0 0 20 26.6667",   iconW: 20,     iconH: 26.667, color: "#EA580C", bg: "#fff7ed", border: "rgba(255,237,213,0.6)" },
-  { label: "Baby Care",  icon: svgPaths.p282fd600,  viewBox: "0 0 24 24",        iconW: 24,     iconH: 24,     color: "#9333EA", bg: "#faf5ff", border: "rgba(243,232,255,0.6)" },
-  { label: "Physio",     icon: svgPaths.p2d11f400,  viewBox: "0 0 26.4 26.4",    iconW: 26.4,   iconH: 26.4,   color: "#4F46E5", bg: "#eef2ff", border: "rgba(224,231,255,0.6)" },
-  { label: "Security",   icon: svgPaths.p286fe780,  viewBox: "0 0 21.3333 26.6667", iconW: 21.333, iconH: 26.667, color: "#475569", bg: "#f1f5f9", border: "rgba(226,232,240,0.6)" },
-  { label: "Pet Care",   icon: svgPaths.p15b38ee0,  viewBox: "0 0 26.6667 25.3333", iconW: 26.667, iconH: 25.333, color: "#D97706", bg: "#fffbeb", border: "rgba(254,243,199,0.6)" },
+  // Row 1
+  { label: "Elder Care",     icon: svgPaths.p3f3a9b80,  viewBox: "0 0 28 27.3333",      iconW: 28,     iconH: 27.333, color: "#2563EB", bg: "#eff6ff", border: "rgba(219,234,254,0.6)" },
+  { label: "Home Nursing",   icon: svgPaths.p23d8d00,   viewBox: "0 0 26.6667 26.6667", iconW: 26.667, iconH: 26.667, color: "#E11D48", bg: "#fff1f2", border: "rgba(255,228,230,0.6)" },
+  { label: "Baby Care",      icon: svgPaths.p282fd600,  viewBox: "0 0 24 24",           iconW: 24,     iconH: 24,     color: "#9333EA", bg: "#faf5ff", border: "rgba(243,232,255,0.6)" },
+  { label: "Companion Care", icon: svgPaths.p286fe780,  viewBox: "0 0 21.3333 26.6667", iconW: 21.333, iconH: 26.667, color: "#0D9488", bg: "#f0fdfa", border: "rgba(204,251,241,0.6)" },
+  // Row 2
+  { label: "Physiotherapy",  icon: svgPaths.p2d11f400,  viewBox: "0 0 26.4 26.4",       iconW: 26.4,   iconH: 26.4,   color: "#4F46E5", bg: "#eef2ff", border: "rgba(224,231,255,0.6)" },
+  { label: "Housekeeping",   icon: svgPaths.p3eb40d60,  viewBox: "0 0 24 29.3333",      iconW: 24,     iconH: 29.333, color: "#059669", bg: "#ecfdf5", border: "rgba(209,250,229,0.6)" },
+  { label: "Personal Chef",  icon: svgPaths.p3dfaed00,  viewBox: "0 0 20 26.6667",      iconW: 20,     iconH: 26.667, color: "#EA580C", bg: "#fff7ed", border: "rgba(255,237,213,0.6)" },
+  { label: "Pet Care",       icon: svgPaths.p15b38ee0,  viewBox: "0 0 26.6667 25.3333", iconW: 26.667, iconH: 25.333, color: "#D97706", bg: "#fffbeb", border: "rgba(254,243,199,0.6)" },
 ];
 
 // ─── Providers pool ───────────────────────────────────────────────────────────
