@@ -45,7 +45,7 @@ function toCheckoutProfile(service: ServiceItem, category: ServiceCategory): Che
     verified: true,
     duration: service.duration,
     expectedPay: service.price,
-    agency: "EasyCare Services",
+    agency: "EaseCare Services",
     bidAmount: service.price,
   };
 }
@@ -74,7 +74,7 @@ function toPaymentProps(
       service: category.label,
       rating: 4.8,
       verified: true,
-      agency: "EasyCare Services",
+      agency: "EaseCare Services",
       role: category.label,
     },
     booking: {

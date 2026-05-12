@@ -74,7 +74,7 @@ const conversations: Conversation[] = [
     online: true,
     role: "Support Team",
     messages: [
-      { id: "m1", text: "Hello! Welcome to EasyCare Support. 👋", time: "10:00 AM", fromMe: false },
+      { id: "m1", text: "Hello! Welcome to EaseCare Support. 👋", time: "10:00 AM", fromMe: false },
       { id: "m2", text: "How can we help you today?", time: "10:01 AM", fromMe: false },
     ],
   },

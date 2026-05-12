@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "motion/react";
 import L from "leaflet";
 import { dataService, type AddressRecord } from "../../services/DataService";
 import { PrimaryButton } from "../shared/PrimaryButton";
+import { logger } from "../../lib/logger";
 
 // Custom pin icon
 const locationIcon = L.divIcon({
@@ -168,7 +169,7 @@ export function AddLocationPage() {
           if (def) setMapCenter(def.coords);
         }
       })
-      .catch((err) => console.error("[AddLocationPage] Failed to load addresses:", err))
+      .catch((err) => logger.error("[AddLocationPage] Failed to load addresses:", err))
       .finally(() => { if (!cancelled) setIsLoading(false); });
     return () => { cancelled = true; };
   }, []);
@@ -259,8 +260,8 @@ export function AddLocationPage() {
     // Persist deletion to Supabase
     dataService
       .removeAddress(id)
-      .then(() => console.log("[AddLocationPage] Address deleted from Supabase"))
-      .catch((err) => console.error("[AddLocationPage] Failed to delete address:", err));
+      .then(() => logger.info("[AddLocationPage] Address deleted from Supabase"))
+      .catch((err) => logger.error("[AddLocationPage] Failed to delete address:", err));
   };
 
   const handleAddAddress = () => {
@@ -283,8 +284,8 @@ export function AddLocationPage() {
     // Persist to Supabase
     dataService
       .saveAddress({ id, label, icon: newLabel, address: newAddress, coords: mapCenter })
-      .then(() => console.log("[AddLocationPage] Address saved to Supabase"))
-      .catch((err) => console.error("[AddLocationPage] Failed to save address:", err));
+      .then(() => logger.info("[AddLocationPage] Address saved to Supabase"))
+      .catch((err) => logger.error("[AddLocationPage] Failed to save address:", err));
   };
 
   const handleEditAddress = (addr: SavedAddress) => {
@@ -314,8 +315,8 @@ export function AddLocationPage() {
     // Persist to Supabase
     dataService
       .saveAddress({ id: updated.id, label, icon: newLabel, address: newAddress, coords: updated.coords })
-      .then(() => console.log("[AddLocationPage] Address updated in Supabase"))
-      .catch((err) => console.error("[AddLocationPage] Failed to update address:", err));
+      .then(() => logger.info("[AddLocationPage] Address updated in Supabase"))
+      .catch((err) => logger.error("[AddLocationPage] Failed to update address:", err));
   };
 
   const closeForm = () => {

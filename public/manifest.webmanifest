@@ -1,0 +1,27 @@
+{
+  "name": "EaseCare — Home Care at Your Doorstep",
+  "short_name": "EaseCare",
+  "description": "Verified caregivers at your doorstep. Better pricing for every home.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#ffffff",
+  "theme_color": "#1975D2",
+  "lang": "en",
+  "categories": ["health", "lifestyle", "medical"],
+  "icons": [
+    {
+      "src": "/easecarelogo-logomark.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/easecarelogo-logomark.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ]
+}

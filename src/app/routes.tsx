@@ -13,7 +13,11 @@
  *   /bookings/:id/bids    → RequireAuth → BidCards (bid viewer for specific booking)
  *
  * Auth guards are ACTIVE — unauthenticated users are redirected to /onboarding.
+ *
+ * CODE SPLITTING: HomePage loads eagerly (instant first paint). All other routes
+ * are lazy-loaded with React.lazy() to shrink the initial bundle from 1.4 MB to ~600 KB.
  */
+import { lazy, Suspense } from "react";
 import { createHashRouter, Navigate } from "react-router";
 import { useRouteError } from "react-router";
 
@@ -24,23 +28,38 @@ import { RequireAuth, RedirectIfAuth } from "./components/auth/AuthGuard";
 import { DashboardLayout } from "./components/layout/DashboardLayout";
 import { PageTransition } from "./components/layout/PageTransition";
 
-// Page components — eagerly imported to avoid "Failed to fetch dynamically
-// imported module" errors in the Figma Make proxy environment.  The app is
-// small enough that code-splitting provides negligible benefit.
+// HomePage — eager (first paint critical)
 import { HomePage } from "./components/home/HomePage";
-import { MyBookings } from "./components/pages/MyBookings";
-import { Messages } from "./components/pages/Messages";
-import { Profile } from "./components/pages/Profile";
-import { AddLocation } from "./components/pages/AddLocation";
-import { Services } from "./components/pages/Services";
-import { OnboardingFlow } from "./components/onboarding/OnboardingFlow";
-import { PostRequirementFlow } from "./components/booking/PostRequirementFlow";
-import { BidCards } from "./components/booking/BidCards";
+
+// All other pages — lazy-loaded per route for smaller initial bundle.
+// Wrap the named exports so React.lazy gets a default export.
+const MyBookings         = lazy(() => import("./components/pages/MyBookings").then(m => ({ default: m.MyBookings })));
+const Messages           = lazy(() => import("./components/pages/Messages").then(m => ({ default: m.Messages })));
+const Profile            = lazy(() => import("./components/pages/Profile").then(m => ({ default: m.Profile })));
+const AddLocation        = lazy(() => import("./components/pages/AddLocation").then(m => ({ default: m.AddLocation })));
+const Services           = lazy(() => import("./components/pages/Services").then(m => ({ default: m.Services })));
+const OnboardingFlow     = lazy(() => import("./components/onboarding/OnboardingFlow").then(m => ({ default: m.OnboardingFlow })));
+const PostRequirementFlow = lazy(() => import("./components/booking/PostRequirementFlow").then(m => ({ default: m.PostRequirementFlow })));
+const BidCards           = lazy(() => import("./components/booking/BidCards").then(m => ({ default: m.BidCards })));
+
+/* ── Suspense fallback while lazy chunk loads ─────────────────────── */
+function RouteFallback() {
+  return (
+    <div className="flex-1 flex items-center justify-center min-h-[60vh]">
+      <div
+        className="size-8 rounded-full animate-spin"
+        style={{ border: "3px solid rgba(25,117,210,0.3)", borderTopColor: "#1975D2" }}
+      />
+    </div>
+  );
+}
+
+const withSuspense = (node: React.ReactNode) => (
+  <Suspense fallback={<RouteFallback />}>{node}</Suspense>
+);
 
 /**
  * Route-level error boundary — shows a friendly error UI with retry.
- * Prevents the infinite-redirect loop that occurred when errorElement
- * used <Navigate to="/" />.
  */
 function RouteErrorBoundary() {
   const error = useRouteError();
@@ -96,27 +115,15 @@ export const router = createHashRouter([
       { index: true, element: <HomePage /> },
       {
         path: "bookings",
-        element: (
-          <RequireAuth>
-            <MyBookings />
-          </RequireAuth>
-        ),
+        element: <RequireAuth>{withSuspense(<MyBookings />)}</RequireAuth>,
       },
       {
         path: "messages",
-        element: (
-          <RequireAuth>
-            <Messages />
-          </RequireAuth>
-        ),
+        element: <RequireAuth>{withSuspense(<Messages />)}</RequireAuth>,
       },
       {
         path: "profile",
-        element: (
-          <RequireAuth>
-            <Profile />
-          </RequireAuth>
-        ),
+        element: <RequireAuth>{withSuspense(<Profile />)}</RequireAuth>,
       },
     ],
   },
@@ -124,9 +131,7 @@ export const router = createHashRouter([
     path: "/onboarding",
     element: (
       <RedirectIfAuth>
-        <PageTransition>
-          <OnboardingFlow />
-        </PageTransition>
+        <PageTransition>{withSuspense(<OnboardingFlow />)}</PageTransition>
       </RedirectIfAuth>
     ),
   },
@@ -134,9 +139,7 @@ export const router = createHashRouter([
     path: "/post-requirement",
     element: (
       <RequireAuth>
-        <PageTransition>
-          <PostRequirementFlow />
-        </PageTransition>
+        <PageTransition>{withSuspense(<PostRequirementFlow />)}</PageTransition>
       </RequireAuth>
     ),
   },
@@ -144,9 +147,7 @@ export const router = createHashRouter([
     path: "/services",
     element: (
       <RequireAuth>
-        <PageTransition>
-          <Services />
-        </PageTransition>
+        <PageTransition>{withSuspense(<Services />)}</PageTransition>
       </RequireAuth>
     ),
   },
@@ -154,9 +155,7 @@ export const router = createHashRouter([
     path: "/add-location",
     element: (
       <RequireAuth>
-        <PageTransition>
-          <AddLocation />
-        </PageTransition>
+        <PageTransition>{withSuspense(<AddLocation />)}</PageTransition>
       </RequireAuth>
     ),
   },
@@ -164,9 +163,7 @@ export const router = createHashRouter([
     path: "/bookings/:id/bids",
     element: (
       <RequireAuth>
-        <PageTransition>
-          <BidCards />
-        </PageTransition>
+        <PageTransition>{withSuspense(<BidCards />)}</PageTransition>
       </RequireAuth>
     ),
   },

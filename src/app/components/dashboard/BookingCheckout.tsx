@@ -73,7 +73,7 @@ interface Coupon {
 }
 const AVAILABLE_COUPONS: Coupon[] = [
   {
-    code: "EASYCARE20",
+    code: "EASECARE20",
     label: "20% off on first booking",
     discount: 20,
     maxDiscount: 500,
@@ -482,7 +482,7 @@ export function BookingCheckout({
           )}
         </div>
 
-        {/* ── EasyCare Plus Upsell ── */}
+        {/* ── EaseCare Plus Upsell ── */}
         <div className="mx-4 mt-3 bg-gradient-to-r from-[#f0f0ff] to-[#e8e4ff] rounded-[20px] p-5 shadow-[0px_1px_4px_rgba(0,0,0,0.04)]">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2.5">
@@ -491,7 +491,7 @@ export function BookingCheckout({
               </div>
               <div>
                 <p className="font-['Lexend',sans-serif] font-bold text-[14px] text-[#111827]">
-                  EasyCare Plus
+                  EaseCare Plus
                 </p>
                 <p className="font-['Inter',sans-serif] text-[11px] text-[#6b7280]">
                   6 months plan
@@ -687,7 +687,7 @@ export function BookingCheckout({
             {plusAdded && (
               <div className="flex items-center justify-between">
                 <span className="font-['Inter',sans-serif] text-[13px] text-[#6b7280]">
-                  EasyCare Plus (6 mo)
+                  EaseCare Plus (6 mo)
                 </span>
                 <span className="font-['Inter',sans-serif] font-medium text-[14px] text-[#111827]">
                   ₹{plusPrice}

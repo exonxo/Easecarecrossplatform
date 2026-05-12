@@ -1,66 +1,196 @@
 import { useState, useRef, useCallback, useEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { ChevronLeft, ChevronRight } from "lucide-react";
-import { ImageWithFallback } from "../figma/ImageWithFallback";
-const slides = [
+import { ChevronLeft, ChevronRight, Sparkles, ShieldCheck, Stethoscope } from "lucide-react";
+
+// ─── Banner data — all rendered via JSX (no image files needed) ──────────────
+
+type Banner = {
+  key: string;
+  badge: string;
+  badgeColor: string;
+  badgeBg: string;
+  title: React.ReactNode;
+  highlight: string;
+  bullets: string[];
+  cta: string;
+  caregiverImage: string;
+  Icon: typeof Sparkles;
+};
+
+const BANNERS: Banner[] = [
   {
-    badge: "LIMITED OFFER",
-    title: "First 3 Bookings — 15% OFF",
-    subtitle: "Use code: WELCOME15",
-    cta: "Claim Now",
-    image: "https://images.unsplash.com/photo-1762237798221-a298c91e18a3?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixlib=rb-4.1.0&q=80&w=1080",
-    badgeColor: "#f97316",
+    key: "launch-offer",
+    badge: "Launch Offer",
+    badgeColor: "#EA580C",
+    badgeBg: "rgba(255,237,213,0.95)",
+    title: <>Special Launch Offers<br />for New Families</>,
+    highlight: "Up to 90% Off",
+    bullets: [
+      "Limited-time launch pricing",
+      "Try services risk-free",
+      "Affordable first bookings",
+    ],
+    cta: "Claim Offer",
+    caregiverImage:
+      "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=700",
+    Icon: Sparkles,
   },
   {
-    badge: "NEW",
-    title: "Verified Home Nursing Care",
-    subtitle: "Background checked & certified nurses",
-    cta: "Explore",
-    image:
-      "https://images.unsplash.com/photo-1721114989769-0423619f03d2?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxudXJzZSUyMHBhdGllbnQlMjBjYXJlJTIwaG9zcGl0YWx8ZW58MXx8fHwxNzcxOTM3ODg1fDA&ixlib=rb-4.1.0&q=80&w=1080",
-    badgeColor: "#2563eb",
+    key: "verified-profiles",
+    badge: "Profile Verification",
+    badgeColor: "#15803D",
+    badgeBg: "rgba(220,252,231,0.95)",
+    title: <>Verified Profiles<br />You Can Trust</>,
+    highlight: "Real People. Real Reviews.",
+    bullets: [
+      "View verified caregiver details",
+      "Check authentic ratings & reviews",
+      "Book confidently, every time",
+    ],
+    cta: "Explore Verified Profiles",
+    caregiverImage:
+      "https://images.unsplash.com/photo-1576091160550-2173dba999ef?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=700",
+    Icon: ShieldCheck,
   },
   {
-    badge: "POPULAR",
-    title: "Elder Care Packages",
-    subtitle: "Starting from ₹7,225/week",
-    cta: "View Packages",
-    image:
-      "https://images.unsplash.com/photo-1667184087086-ac955d1f300d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxpbmRpYW4lMjBmYW1pbHklMjBlbGRlciUyMGNhcmUlMjBoYXBweXxlbnwxfHx8fDE3NzIwMDQwNDV8MA&ixlib=rb-4.1.0&q=80&w=1080",
-    badgeColor: "#7c3aed",
-  },
-  {
-    badge: "TRENDING",
-    title: "Baby Sitter On Demand",
-    subtitle: "Trusted & verified sitters near you",
-    cta: "Book Now",
-    image:
-      "https://images.unsplash.com/photo-1765896387493-b473e1c0fb78?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxlbGRlcmx5JTIwY2FyZSUyMG51cnNpbmclMjBob21lJTIwcGVhY2VmdWx8ZW58MXx8fHwxNzcyMDA0MDQ0fDA&ixlib=rb-4.1.0&q=80&w=1080",
-    badgeColor: "#059669",
+    key: "hospital-partnership",
+    badge: "Hospital Partnerships",
+    badgeColor: "#0D9488",
+    badgeBg: "rgba(204,251,241,0.95)",
+    title: <>Connected with Trusted<br />Healthcare Partners</>,
+    highlight: "Professional Support Network",
+    bullets: [
+      "Verified hospital partnerships",
+      "Better support ecosystem",
+      "Reliable care connections",
+    ],
+    cta: "Access Trusted Support",
+    caregiverImage:
+      "https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=700",
+    Icon: Stethoscope,
   },
 ];
 
+// ─── Banner card ──────────────────────────────────────────────────────────────
+
+function BannerCard({ banner }: { banner: Banner }) {
+  const { Icon } = banner;
+  return (
+    <div className="absolute inset-0 rounded-[18px] overflow-hidden" style={{ backgroundColor: "#1975D2" }}>
+      {/* Dot pattern */}
+      <div
+        className="absolute inset-0 opacity-10"
+        style={{
+          backgroundImage: "radial-gradient(circle, rgba(255,255,255,0.5) 1px, transparent 1px)",
+          backgroundSize: "28px 28px",
+        }}
+      />
+      {/* Soft glow ellipse */}
+      <div
+        className="absolute pointer-events-none"
+        style={{
+          width: 428, height: 428,
+          top: -168, left: -178,
+          background: "radial-gradient(circle, rgba(255,255,255,0.18) 0%, transparent 70%)",
+          borderRadius: "50%",
+        }}
+      />
+
+      {/* Caregiver image — right anchored */}
+      <div className="absolute right-0 bottom-0 top-0 w-[44%] md:w-[46%] pointer-events-none">
+        <img
+          src={banner.caregiverImage}
+          alt="Professional caregiver"
+          className="w-full h-full object-cover object-center"
+        />
+        <div
+          className="absolute inset-y-0 left-0 w-40 pointer-events-none"
+          style={{ background: "linear-gradient(to right, #1975D2 0%, rgba(25,117,210,0.4) 50%, transparent 100%)" }}
+        />
+      </div>
+
+      {/* Text content — left side */}
+      <div className="absolute inset-0 flex flex-col justify-center pl-6 md:pl-10 pr-[44%] md:pr-[42%] z-10">
+        {/* Badge */}
+        <div
+          className="self-start flex items-center gap-1.5 px-3 py-1 rounded-full mb-4 md:mb-5"
+          style={{ backgroundColor: banner.badgeBg }}
+        >
+          <Icon size={12} style={{ color: banner.badgeColor }} strokeWidth={2.5} />
+          <span
+            className="font-['Lexend',sans-serif] font-semibold text-[10px] md:text-[11px] tracking-[0.3px]"
+            style={{ color: banner.badgeColor }}
+          >
+            {banner.badge}
+          </span>
+        </div>
+
+        {/* Title */}
+        <h3
+          className="font-['Lexend',sans-serif] font-extrabold text-white leading-[1.15] mb-2 md:mb-3"
+          style={{ fontSize: "clamp(20px, 2.6vw, 36px)" }}
+        >
+          {banner.title}
+        </h3>
+
+        {/* Highlight */}
+        <p
+          className="font-['Lexend',sans-serif] font-semibold mb-3 md:mb-5"
+          style={{ color: "#FCD34D", fontSize: "clamp(14px, 1.6vw, 22px)" }}
+        >
+          {banner.highlight}
+        </p>
+
+        {/* Bullets */}
+        <ul className="flex flex-col gap-1.5 md:gap-2 mb-4 md:mb-6">
+          {banner.bullets.map((b) => (
+            <li
+              key={b}
+              className="flex items-center gap-2 font-['Inter',sans-serif] text-white/95"
+              style={{ fontSize: "clamp(11px, 1vw, 14px)" }}
+            >
+              <span
+                className="w-1.5 h-1.5 rounded-full shrink-0"
+                style={{ backgroundColor: "#FCD34D" }}
+              />
+              {b}
+            </li>
+          ))}
+        </ul>
+
+        {/* CTA */}
+        <button
+          className="self-start bg-white text-[#1975D2] font-['Lexend',sans-serif] font-bold rounded-full hover:bg-[#f0f7fa] active:scale-[0.97] transition-all cursor-pointer shadow-[0_4px_14px_rgba(0,0,0,0.20)]"
+          style={{
+            fontSize: "clamp(12px, 1.1vw, 14px)",
+            padding: "clamp(8px, 1vw, 12px) clamp(20px, 2vw, 28px)",
+          }}
+        >
+          {banner.cta} →
+        </button>
+      </div>
+    </div>
+  );
+}
+
+// ─── Main HeroBanner — single large auto-rotating carousel ───────────────────
+
 export function HeroBanner() {
   const [current, setCurrent] = useState(0);
-  const [direction, setDirection] = useState(1);
   const touchStart = useRef<number | null>(null);
   const touchEnd = useRef<number | null>(null);
-
   const minSwipeDistance = 50;
 
   const prev = useCallback(() => {
-    setDirection(-1);
-    setCurrent((c) => (c === 0 ? slides.length - 1 : c - 1));
+    setCurrent((c) => (c === 0 ? BANNERS.length - 1 : c - 1));
   }, []);
 
   const next = useCallback(() => {
-    setDirection(1);
-    setCurrent((c) => (c === slides.length - 1 ? 0 : c + 1));
+    setCurrent((c) => (c === BANNERS.length - 1 ? 0 : c + 1));
   }, []);
 
-  // Auto-advance every 5s
   useEffect(() => {
-    const timer = setInterval(next, 5000);
+    const timer = setInterval(next, 6000);
     return () => clearInterval(timer);
   }, [next]);
 
@@ -75,176 +205,71 @@ export function HeroBanner() {
     if (!touchStart.current || !touchEnd.current) return;
     const distance = touchStart.current - touchEnd.current;
     if (Math.abs(distance) >= minSwipeDistance) {
-      if (distance > 0) next();
-      else prev();
+      distance > 0 ? next() : prev();
     }
     touchStart.current = null;
     touchEnd.current = null;
   };
 
-  const slide = slides[current];
-
-  const featuredSlide = slides[0];
-
   return (
     <div className="flex flex-col gap-3 w-full">
-
-      {/* ── DESKTOP: vertical stack — big banner on top, 3 thumbnails in a row below ── */}
-      <div className="hidden lg:flex flex-col gap-3">
-
-        {/* Big featured banner — full width */}
-        <div className="relative w-full h-[280px] rounded-[20px] overflow-hidden">
-          <ImageWithFallback
-            src={featuredSlide.image}
-            alt="Featured promotion"
-            className="w-full h-full object-cover"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-black/20 to-black/5" />
-          <div className="absolute inset-0 z-10 flex flex-col justify-end p-8 max-w-[560px]">
-            <span
-              className="text-white font-['Lexend',sans-serif] font-bold text-[10px] px-2.5 py-1 rounded-full w-fit tracking-[0.5px] mb-3"
-              style={{ backgroundColor: featuredSlide.badgeColor }}
-            >
-              {featuredSlide.badge}
-            </span>
-            <h2 className="font-['Lexend',sans-serif] font-bold text-[30px] text-white leading-[1.2] mb-1">
-              {featuredSlide.title}
-            </h2>
-            <p className="font-['Inter',sans-serif] text-[14px] text-white/80 mb-4">
-              {featuredSlide.subtitle}
-            </p>
-            <button className="bg-white text-[#1975D2] font-['Lexend',sans-serif] font-bold text-[13px] px-6 py-2.5 rounded-full hover:bg-[#f0f7fa] transition-colors cursor-pointer w-fit shadow-[0_4px_12px_rgba(0,0,0,0.15)]">
-              {featuredSlide.cta}
-            </button>
-          </div>
-        </div>
-
-        {/* Smaller slides — 3-col horizontal row below */}
-        <div className="grid grid-cols-3 gap-3">
-          {slides.slice(1).map((slide) => (
-            <div
-              key={slide.badge}
-              className="relative h-[140px] rounded-[16px] overflow-hidden cursor-pointer group"
-            >
-              <ImageWithFallback
-                src={slide.image}
-                alt={slide.title}
-                className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
-              <div className="absolute inset-0 z-10 flex flex-col justify-end p-3.5">
-                <span
-                  className="text-white font-['Lexend',sans-serif] font-bold text-[9px] px-2 py-0.5 rounded-full w-fit tracking-[0.5px] mb-1.5"
-                  style={{ backgroundColor: slide.badgeColor }}
-                >
-                  {slide.badge}
-                </span>
-                <p className="font-['Lexend',sans-serif] font-bold text-[13px] text-white leading-[18px] line-clamp-2">
-                  {slide.title}
-                </p>
-              </div>
-            </div>
-          ))}
-        </div>
-
-      </div>
-
-      {/* ── MOBILE: swipeable carousel ── */}
+      {/* Single large banner — auto rotates */}
       <div
-        className="lg:hidden relative w-full aspect-[16/9] sm:aspect-[2/1] md:aspect-[5/2] min-h-[180px] max-h-[320px] rounded-[18px] md:rounded-[24px] overflow-hidden group select-none"
+        className="relative w-full rounded-[18px] overflow-hidden select-none group"
+        style={{ aspectRatio: "16/7", minHeight: 280 }}
         onTouchStart={onTouchStart}
         onTouchMove={onTouchMove}
         onTouchEnd={onTouchEnd}
       >
-        {/* Background image with crossfade */}
         <AnimatePresence mode="popLayout" initial={false}>
           <motion.div
-            key={current}
-            initial={{ opacity: 0, scale: 1.05 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 1.02 }}
-            transition={{ duration: 0.5, ease: "easeInOut" }}
+            key={BANNERS[current].key}
+            initial={{ opacity: 0, x: 30 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -30 }}
+            transition={{ duration: 0.45, ease: "easeInOut" }}
             className="absolute inset-0"
           >
-            <ImageWithFallback
-              src={slide.image}
-              alt="Hero banner"
-              className="w-full h-full object-cover"
-            />
+            <BannerCard banner={BANNERS[current]} />
           </motion.div>
         </AnimatePresence>
 
-        {/* Gradient overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-black/5" />
-
-        {/* ── Content — bottom-aligned, responsive ── */}
-        <div className="absolute inset-0 z-10 flex flex-col justify-end p-5 sm:p-6 md:p-8 lg:p-10">
-          <AnimatePresence mode="wait" initial={false}>
-            <motion.div
-              key={current}
-              initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.3 }}
-              className="flex flex-col gap-2 sm:gap-2.5 md:gap-3 max-w-[520px]"
-            >
-              {/* Badge */}
-              <span
-                className="text-white font-['Lexend',sans-serif] font-bold text-[9px] sm:text-[10px] md:text-[11px] px-2.5 py-[3px] md:px-3 md:py-1 rounded-full w-fit tracking-[0.5px] leading-none"
-                style={{ backgroundColor: slide.badgeColor }}
-              >
-                {slide.badge}
-              </span>
-
-              {/* Title — no forced line breaks, let it wrap naturally */}
-              <h2 className="font-['Lexend',sans-serif] font-bold text-[22px] sm:text-[26px] md:text-[32px] lg:text-[36px] text-white leading-[1.2] tracking-[-0.3px]">
-                {slide.title}
-              </h2>
-
-              {/* Subtitle */}
-              <p className="font-['Inter',sans-serif] text-[12px] sm:text-[13px] md:text-[15px] text-white/80 leading-[1.4]">
-                {slide.subtitle}
-              </p>
-
-              {/* CTA — always auto-width, properly sized */}
-              <div className="pt-1">
-                <button className="bg-white text-[#1975D2] font-['Lexend',sans-serif] font-bold text-[12px] sm:text-[13px] md:text-[14px] px-5 py-2 sm:px-6 sm:py-2.5 md:px-7 md:py-3 rounded-full hover:bg-[#f0f7fa] hover:shadow-lg active:scale-[0.97] transition-all cursor-pointer shadow-[0_4px_12px_rgba(0,0,0,0.15)]">
-                  {slide.cta}
-                </button>
-              </div>
-            </motion.div>
-          </AnimatePresence>
-        </div>
-
-        {/* ── Nav arrows — desktop only ── */}
+        {/* Desktop nav arrows — appear on hover */}
         <button
           onClick={prev}
-          className="hidden md:flex absolute left-4 top-1/2 -translate-y-1/2 bg-white/20 backdrop-blur-sm hover:bg-white/40 size-10 rounded-full items-center justify-center opacity-0 group-hover:opacity-100 transition-all cursor-pointer"
+          aria-label="Previous banner"
+          className="hidden md:flex absolute left-3 top-1/2 -translate-y-1/2 bg-white/85 hover:bg-white size-10 rounded-full items-center justify-center shadow-md opacity-0 group-hover:opacity-100 transition-all cursor-pointer z-20"
         >
-          <ChevronLeft size={20} className="text-white" />
+          <ChevronLeft size={18} className="text-[#374151]" aria-hidden="true" />
         </button>
         <button
           onClick={next}
-          className="hidden md:flex absolute right-4 top-1/2 -translate-y-1/2 bg-white/20 backdrop-blur-sm hover:bg-white/40 size-10 rounded-full items-center justify-center opacity-0 group-hover:opacity-100 transition-all cursor-pointer"
+          aria-label="Next banner"
+          className="hidden md:flex absolute right-3 top-1/2 -translate-y-1/2 bg-white/85 hover:bg-white size-10 rounded-full items-center justify-center shadow-md opacity-0 group-hover:opacity-100 transition-all cursor-pointer z-20"
         >
-          <ChevronRight size={20} className="text-white" />
+          <ChevronRight size={18} className="text-[#374151]" aria-hidden="true" />
         </button>
 
       </div>
 
-      {/* ── Mobile chevron nav below carousel ── */}
-      <div className="flex lg:hidden gap-4 items-center justify-center">
+      {/* Mobile prev/next + counter */}
+      <div className="flex md:hidden gap-4 items-center justify-center">
         <button
           onClick={prev}
+          aria-label="Previous banner"
           className="size-8 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 active:scale-95 transition-all cursor-pointer"
         >
-          <ChevronLeft size={18} className="text-gray-700" />
+          <ChevronLeft size={18} className="text-gray-700" aria-hidden="true" />
         </button>
+        <span className="text-[12px] font-['Inter',sans-serif] text-gray-400 min-w-[40px] text-center" aria-live="polite">
+          {current + 1} / {BANNERS.length}
+        </span>
         <button
           onClick={next}
+          aria-label="Next banner"
           className="size-8 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 active:scale-95 transition-all cursor-pointer"
         >
-          <ChevronRight size={18} className="text-gray-700" />
+          <ChevronRight size={18} className="text-gray-700" aria-hidden="true" />
         </button>
       </div>
     </div>

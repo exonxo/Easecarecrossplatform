@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router";
+import { logger } from "../../lib/logger";
 import {
   Bell,
   FileText,
@@ -292,8 +293,8 @@ export function ProfilePage() {
         location: updated.location,
         memberSince: updated.memberSince,
       })
-      .then(() => console.log("[ProfilePage] Profile saved to Supabase"))
-      .catch((err) => console.warn("[ProfilePage] Failed to save profile:", err));
+      .then(() => logger.info("[ProfilePage] Profile saved to Supabase"))
+      .catch((err) => logger.warn("[ProfilePage] Failed to save profile:", err));
   };
 
   return (

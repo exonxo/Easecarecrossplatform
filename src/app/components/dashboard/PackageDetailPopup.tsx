@@ -323,7 +323,7 @@ function toCheckoutProfile(pkg: PackageDetail): CheckoutProfile {
     verified: true,
     duration: pkg.duration,
     expectedPay: pkg.price,
-    agency: "EasyCare Packages",
+    agency: "EaseCare Packages",
     bidAmount: pkg.price,
   };
 }
@@ -353,7 +353,7 @@ function toPaymentProps(
       service: "Care Package",
       rating: 4.9,
       verified: true,
-      agency: "EasyCare Packages",
+      agency: "EaseCare Packages",
       role: "Care Package",
     },
     booking: {

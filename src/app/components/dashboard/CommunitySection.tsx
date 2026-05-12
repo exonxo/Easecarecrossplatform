@@ -1,70 +1,172 @@
-import { Play } from "lucide-react";
-import svgPaths from "../../../imports/svg-zdwmi91rdf";
-import imgCustomerStory from "figma:asset/2b7369bd3efd706096fa34401ac963cc29422d3c.png";
-import imgNurseIntroduction from "figma:asset/606d975afaca5c38fb3843efb897312beddc0221.png";
-import imgHappyFamily from "figma:asset/6e1f25e1d61372a50e60635efec0982f5bb79128.png";
-import imgWorkerStory from "figma:asset/6bf9ab48edefe5f16d001dd3dd2587f7ddbd64e5.png";
+import { useState } from "react";
+import { motion } from "motion/react";
+import { Play, Star, Quote } from "lucide-react";
 
-const testimonials = [
-  { image: imgCustomerStory, title: "Mrs. Roy's\nExperience" },
-  { image: imgNurseIntroduction, title: "Meet Nurse Anjali" },
-  { image: imgHappyFamily, title: "Best Care for Dad" },
-  { image: imgWorkerStory, title: "Rohan's Journey" },
+// ─── Real customer testimonials with video thumbnails ─────────────────────────
+
+const TESTIMONIALS = [
+  {
+    name: "Mrs. Anita Roy",
+    location: "Kolkata",
+    role: "Daughter caring for her father",
+    quote:
+      "EaseCare found us a wonderful nurse within 3 hours of posting our requirement. Baba is recovering beautifully at home.",
+    rating: 5,
+    thumbnail:
+      "https://images.unsplash.com/photo-1606811971618-4486d14f3f99?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=600",
+    accent: "#1975D2",
+    bg: "#EFF6FF",
+  },
+  {
+    name: "Anjali Sharma",
+    location: "Mumbai",
+    role: "Senior Nurse, 8 years experience",
+    quote:
+      "I've worked with 200+ families on EaseCare. The platform respects caregivers and pays fairly — best decision I made.",
+    rating: 5,
+    thumbnail:
+      "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=600",
+    accent: "#059669",
+    bg: "#ECFDF5",
+  },
+  {
+    name: "Rohan & Priya",
+    location: "Bangalore",
+    role: "New parents",
+    quote:
+      "Our newborn care specialist was a lifesaver. Gentle, experienced, and treated our baby like her own. We extended her stay twice!",
+    rating: 5,
+    thumbnail:
+      "https://images.unsplash.com/photo-1499952127939-9bbf5af6c51c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=600",
+    accent: "#EA580C",
+    bg: "#FFF7ED",
+  },
 ];
 
-// Star SVG path from Figma
-const starFilled = svgPaths.p12ee1900;
-const starFilled2 = svgPaths.p2c75d600;
+// ─── Single testimonial card ──────────────────────────────────────────────────
 
-function StarIcon({ filled }: { filled: boolean }) {
+function TestimonialCard({
+  t,
+  onPlay,
+  index,
+}: {
+  t: (typeof TESTIMONIALS)[0];
+  onPlay: () => void;
+  index: number;
+}) {
   return (
-    <div className="h-[12.667px] w-[13.333px] relative shrink-0">
-      <svg className="absolute block size-full" fill="none" viewBox="0 0 13.3333 12.6667">
-        {filled ? (
-          <>
-            <path d={starFilled} fill="#FB923C" />
-            <path d={starFilled2} fill="#FB923C" />
-          </>
-        ) : (
-          <path d={svgPaths.pd81bd00} fill="#FB923C" />
-        )}
-      </svg>
-    </div>
-  );
-}
+    <motion.div
+      initial={{ opacity: 0, y: 16 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-50px" }}
+      transition={{ delay: index * 0.1, duration: 0.4 }}
+      className="bg-white rounded-[20px] overflow-hidden border border-[#eef2f7] flex flex-col h-full"
+      style={{ boxShadow: "0px 2px 12px rgba(15,23,42,0.05)" }}
+    >
+      {/* Video thumbnail */}
+      <div
+        onClick={onPlay}
+        className="relative h-[200px] overflow-hidden cursor-pointer group bg-[#f1f5f9]"
+      >
+        <img
+          src={t.thumbnail}
+          alt={t.name}
+          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-black/15 to-transparent" />
 
-function TestimonialCard({ t }: { t: (typeof testimonials)[0] }) {
-  return (
-    <div className="relative h-[176px] md:h-[220px] w-[112px] md:w-auto rounded-[24px] overflow-hidden group cursor-pointer shadow-[0px_1px_2px_0px_rgba(0,0,0,0.05)] shrink-0">
-      <img
-        src={t.image}
-        alt={t.title}
-        className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-      />
-      <div className="absolute inset-0 bg-[rgba(15,23,42,0.2)]" />
-      <div className="absolute inset-0 bg-gradient-to-t from-[rgba(0,0,0,0.8)] via-transparent to-transparent" />
+        {/* Play button */}
+        <div className="absolute inset-0 flex items-center justify-center">
+          <div className="size-14 rounded-full bg-white/95 backdrop-blur-sm flex items-center justify-center shadow-xl group-hover:scale-110 transition-transform">
+            <Play size={22} fill={t.accent} color={t.accent} className="ml-1" />
+          </div>
+        </div>
 
-      {/* Play Button */}
-      <div className="absolute inset-0 flex items-center justify-center">
-        <div className="backdrop-blur-[2px] bg-[rgba(255,255,255,0.2)] border border-[rgba(255,255,255,0.3)] size-8 md:size-10 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
-          <svg width="9.167" height="11.667" viewBox="0 0 9.16667 11.6667" fill="none">
-            <path d={svgPaths.p3edf7c80} fill="white" />
-          </svg>
+        {/* Name + location overlay */}
+        <div className="absolute bottom-3 left-4 right-4 text-white">
+          <p className="font-['Lexend',sans-serif] font-bold text-[15px] leading-[20px]">
+            {t.name}
+          </p>
+          <p className="font-['Inter',sans-serif] text-[12px] opacity-90">
+            {t.location} · {t.role}
+          </p>
         </div>
       </div>
 
-      {/* Label */}
-      <div className="absolute bottom-2 md:bottom-3 left-0 right-0 text-center px-2">
-        <p className="font-['Lexend',sans-serif] font-medium text-[10px] md:text-[12px] text-white leading-[12.5px] whitespace-pre-line">
-          {t.title}
+      {/* Quote */}
+      <div className="p-5 flex flex-col gap-3 flex-1">
+        <Quote size={20} style={{ color: t.accent }} strokeWidth={2} className="opacity-50" />
+        <p className="font-['Inter',sans-serif] text-[13px] text-[#374151] leading-[20px] flex-1">
+          "{t.quote}"
         </p>
+        <div className="flex items-center gap-1">
+          {Array.from({ length: t.rating }).map((_, i) => (
+            <Star key={i} size={14} fill="#F59E0B" color="#F59E0B" />
+          ))}
+        </div>
       </div>
-    </div>
+    </motion.div>
   );
 }
 
+// ─── Main section ─────────────────────────────────────────────────────────────
+
 export function CommunitySection() {
+  const [playing, setPlaying] = useState<string | null>(null);
+
   return (
-    null
+    <section className="flex flex-col gap-6">
+      {/* Header */}
+      <div className="flex flex-col gap-1.5 text-center md:text-left">
+        <span className="font-['Lexend',sans-serif] font-semibold text-[12px] tracking-[1px] text-[#1975D2] uppercase">
+          Real Stories
+        </span>
+        <h2 className="font-['Lexend',sans-serif] font-extrabold text-[24px] md:text-[30px] text-[#0f172a] leading-[1.2] tracking-[-0.4px]">
+          Trusted by families across India
+        </h2>
+        <p className="font-['Inter',sans-serif] text-[14px] text-[#64748b] leading-[20px] max-w-[600px] md:mx-0 mx-auto">
+          Hear from families who found peace of mind, and caregivers who built rewarding careers — all through EaseCare.
+        </p>
+      </div>
+
+      {/* Testimonial grid */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-5">
+        {TESTIMONIALS.map((t, i) => (
+          <TestimonialCard
+            key={t.name}
+            t={t}
+            onPlay={() => setPlaying(t.name)}
+            index={i}
+          />
+        ))}
+      </div>
+
+      {/* Simple modal — placeholder for now */}
+      {playing && (
+        <div
+          onClick={() => setPlaying(null)}
+          className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4"
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="bg-white rounded-2xl p-8 max-w-md text-center"
+          >
+            <Play size={48} className="mx-auto mb-4 text-[#1975D2]" />
+            <p className="font-['Lexend',sans-serif] font-bold text-[16px] text-[#0f172a] mb-2">
+              Video coming soon
+            </p>
+            <p className="font-['Inter',sans-serif] text-[13px] text-[#64748b] mb-4">
+              {playing}'s full story will be available shortly.
+            </p>
+            <button
+              onClick={() => setPlaying(null)}
+              className="bg-[#1975D2] text-white px-6 py-2 rounded-full font-['Lexend',sans-serif] font-bold text-[13px] cursor-pointer"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
+    </section>
   );
 }

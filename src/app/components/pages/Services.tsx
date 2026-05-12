@@ -1,13 +1,16 @@
 /**
- * Services - Full-page listing of all available service categories.
- * Renders QuickCategories grid in a standalone page with back navigation.
+ * Services — Full-page listing of all service categories.
+ * If a `?category=Elder%20Care` query param is provided, auto-opens
+ * the relevant category modal so the user lands directly on a service list.
  */
-import { useNavigate } from "react-router";
+import { useNavigate, useSearchParams } from "react-router";
 import { ArrowLeft } from "lucide-react";
 import { QuickCategories } from "../home/QuickCategories";
 
 export function Services() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const initialCategoryLabel = searchParams.get("category") ?? undefined;
 
   return (
     <div className="min-h-screen bg-[#f6f8fc] md:bg-[#F0F7FA]">
@@ -20,12 +23,15 @@ export function Services() {
           >
             <ArrowLeft size={18} className="text-[#334155]" />
           </button>
+          <h1 className="font-['Lexend',sans-serif] font-bold text-[16px] md:text-[18px] text-[#0f172a]">
+            {initialCategoryLabel ?? "All Services"}
+          </h1>
         </div>
       </div>
 
       {/* Content */}
       <div className="max-w-[1180px] mx-auto px-4 md:px-8 py-6 md:py-8">
-        <QuickCategories />
+        <QuickCategories initialCategoryLabel={initialCategoryLabel} />
       </div>
     </div>
   );

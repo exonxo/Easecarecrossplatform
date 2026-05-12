@@ -1,36 +1,43 @@
 import { PullToRefresh } from "../layout/PullToRefresh";
 import { PromoSection } from "./PromoSection";
-import { QuickCategories } from "./QuickCategories";
-import { FeaturedCategory } from "./FeaturedCategory";
+import { StatsBar } from "./StatsBar";
+import { MostBookedServices } from "./MostBookedServices";
+import { HowItWorks } from "./HowItWorks";
 import { CarePackages } from "./CarePackages";
+import { HeroBanner } from "./HeroBanner";
 import { CommunitySection } from "./CommunitySection";
+import { AppDownloadCTA } from "./AppDownloadCTA";
 
 export function HomePage() {
   return (
     <PullToRefresh>
       <main className="flex-1 pb-[100px] md:pb-0">
-        <div className="w-full min-w-0 max-w-[1180px] mx-auto px-4 md:px-8 pt-5 md:pt-7 pb-6 flex flex-col gap-8 md:gap-10">
+        <div className="w-full min-w-0 max-w-[1180px] mx-auto px-4 md:px-8 pt-5 md:pt-7 pb-12 flex flex-col gap-10 md:gap-14">
 
-          {/* ── Hero: shortcuts + promo banners ── */}
+          {/* 1 ── HERO: heading + categories card + blue pricing panel */}
           <PromoSection />
 
-          {/* ── All 8 category shortcuts (UC-style grid) ── */}
-          <QuickCategories />
+          {/* 2 ── TRUST BAR: 4 numerical stats */}
+          <StatsBar />
 
-          {/* ── Elder Care — expanded inline (priority category) ── */}
-          <FeaturedCategory categoryLabel="Elder Care" />
+          {/* 3 ── MOST BOOKED SERVICES carousel with Popular/Trending badges */}
+          <MostBookedServices />
 
-          {/* ── Cleaning — expanded inline (priority category) ── */}
-          <FeaturedCategory categoryLabel="Cleaning" />
+          {/* 4 ── HOW IT WORKS — 4-step process */}
+          <HowItWorks />
 
-          {/* ── Care packages ── */}
+          {/* 5 ── CARE PACKAGES — Bento grid (1 featured + 4 smaller) */}
           <CarePackages />
 
-        </div>
+          {/* 6 ── PROMO BANNERS (auto-rotating, full width) */}
+          <HeroBanner />
 
-        {/* ── Testimonials — full bleed ── */}
-        <div className="max-w-[1180px] mx-auto md:px-8">
+          {/* 7 ── TESTIMONIALS — real stories with video thumbnails */}
           <CommunitySection />
+
+          {/* 8 ── APP DOWNLOAD CTA strip */}
+          <AppDownloadCTA />
+
         </div>
       </main>
     </PullToRefresh>

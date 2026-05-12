@@ -192,7 +192,7 @@ export const profileApi = {
 // ─── Promo Codes ───
 const VALID_PROMOS: Record<string, { discount: number; label: string }> = {
   WELCOME15: { discount: 15, label: "WELCOME15" },
-  EASYCARE20: { discount: 20, label: "EASYCARE20" },
+  EASECARE20: { discount: 20, label: "EASECARE20" },
   CARE100: { discount: 0, label: "CARE100" },
   FESTIVE10: { discount: 10, label: "FESTIVE10" },
 };

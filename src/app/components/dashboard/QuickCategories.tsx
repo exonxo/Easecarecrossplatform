@@ -482,12 +482,24 @@ function CategoryModal({
 
 // ─── Main QuickCategories ─────────────────────────────────────────────────────
 
-export function QuickCategories() {
+export function QuickCategories({ initialCategoryLabel }: { initialCategoryLabel?: string } = {}) {
   const navigate = useNavigate();
   const { setBookedProvider } = useBooking();
   const { requireAuth, loginOpen, setLoginOpen } = useRequireAuth();
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
+
+  // Auto-open a category modal if the URL pre-selected one
+  useEffect(() => {
+    if (!initialCategoryLabel) return;
+    const match = categories.find(
+      (c) => c.label.toLowerCase() === initialCategoryLabel.toLowerCase()
+    );
+    if (match) {
+      setSelectedCategory(match);
+      setModalOpen(true);
+    }
+  }, [initialCategoryLabel]);
 
   const [bookingService, setBookingService] = useState<ServiceItem | null>(null);
   const [bookingCategory, setBookingCategory] = useState<Category | null>(null);

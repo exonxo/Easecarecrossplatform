@@ -70,7 +70,7 @@ function ServiceCard({
   );
 }
 
-// ─── Desktop service card (wider, grid layout) ────────────────────────────────
+// ─── Desktop service card — Figma horizontal split (image-left, text-right) ───
 
 function ServiceCardDesktop({
   service,
@@ -88,11 +88,11 @@ function ServiceCardDesktop({
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.04 }}
-      className="group bg-white rounded-[16px] border border-[#f1f5f9] overflow-hidden shadow-[0_1px_4px_rgba(0,0,0,0.05)] hover:shadow-[0_6px_20px_rgba(0,0,0,0.09)] hover:border-[#e2e8f0] transition-all flex flex-col cursor-pointer"
+      className="group bg-white rounded-[16px] border border-[#f1f5f9] overflow-hidden shadow-[0_1px_4px_rgba(0,0,0,0.05)] hover:shadow-[0_6px_20px_rgba(0,0,0,0.09)] hover:border-[#e2e8f0] transition-all flex flex-row cursor-pointer h-[120px]"
       onClick={() => onBook(service)}
     >
-      {/* Photo */}
-      <div className="relative h-[140px] overflow-hidden bg-[#f1f5f9]">
+      {/* Left — image */}
+      <div className="relative w-[120px] shrink-0 overflow-hidden bg-[#f1f5f9]">
         <ImageWithFallback
           src={service.photo}
           alt={service.name}
@@ -100,20 +100,22 @@ function ServiceCardDesktop({
         />
       </div>
 
-      {/* Body */}
-      <div className="flex flex-col gap-1.5 p-4 flex-1">
-        <h4 className="font-['Lexend',sans-serif] font-semibold text-[13px] text-[#0f172a] leading-[19px] group-hover:text-[#1975D2] transition-colors">
-          {service.name}
-        </h4>
-        <p className="font-['Inter',sans-serif] text-[11px] text-[#94a3b8] line-clamp-2 leading-[16px]">
-          {service.description}
-        </p>
-        <div className="flex items-center justify-between mt-auto pt-2 border-t border-[#f8fafc]">
+      {/* Right — text content */}
+      <div className="flex flex-col justify-between flex-1 p-4">
+        <div className="flex flex-col gap-1">
+          <h4 className="font-['Lexend',sans-serif] font-semibold text-[13px] text-[#0f172a] leading-[19px] line-clamp-2 group-hover:text-[#1975D2] transition-colors">
+            {service.name}
+          </h4>
+          <p className="font-['Inter',sans-serif] text-[11px] text-[#94a3b8] line-clamp-2 leading-[16px]">
+            {service.description}
+          </p>
+        </div>
+        <div className="flex flex-col gap-0.5 border-t border-[#faf5ff] pt-2">
           <span
-            className="font-['Lexend',sans-serif] font-bold text-[12px]"
+            className="font-['Lexend',sans-serif] font-bold text-[12px] leading-[18px]"
             style={{ color: categoryColor }}
           >
-            {service.price}
+            Starting from {service.price}
           </span>
           <span className="font-['Inter',sans-serif] text-[10px] text-[#94a3b8]">
             {service.duration}
@@ -219,8 +221,8 @@ export function FeaturedCategory({ categoryLabel }: FeaturedCategoryProps) {
           ))}
         </div>
 
-        {/* Desktop: 3-col grid (6 services = 2 rows) */}
-        <div className="hidden md:grid grid-cols-3 gap-4">
+        {/* Desktop: 3-col grid (6 services = 2 rows × 3 cols) */}
+        <div className="hidden md:grid grid-cols-3 gap-3">
           {services.map((service, i) => (
             <ServiceCardDesktop
               key={service.name}

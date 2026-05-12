@@ -11,7 +11,7 @@ interface PrimaryButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 /**
- * Unified primary CTA button for the entire EasyCare UI.
+ * Unified primary CTA button for the entire EaseCare UI.
  *
  * Style: rounded-[16px], Inter semibold, active:scale-[0.98], colored shadow
  * glow, disabled opacity + cursor states.

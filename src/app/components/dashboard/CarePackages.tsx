@@ -209,6 +209,114 @@ const SYSTEM_PROVIDERS = [
   },
 ];
 
+// ─── Bento card — adapts to size (featured | small | compact) ────────────────
+
+function BentoPackageCard({
+  pkg,
+  onTap,
+  size = "small",
+}: {
+  pkg: (typeof packages)[0];
+  onTap: () => void;
+  size?: "featured" | "small" | "compact";
+}) {
+  const isFeatured = size === "featured";
+  const imgHeight = isFeatured ? "h-[260px] md:h-full md:min-h-[300px]" : "h-[140px]";
+
+  return (
+    <div
+      onClick={onTap}
+      className={`group relative rounded-[20px] overflow-hidden cursor-pointer transition-all active:scale-[0.98] flex flex-col h-full ${isFeatured ? "md:flex-row" : ""}`}
+      style={{
+        border: `1.5px solid ${pkg.borderColor}`,
+        boxShadow: "0px 2px 8px rgba(15,23,42,0.05)",
+        backgroundImage: pkg.gradient,
+      }}
+    >
+      {/* Banner image */}
+      <div className={`relative w-full ${isFeatured ? "md:w-[45%]" : ""} ${imgHeight} overflow-hidden shrink-0`}>
+        <ImageWithFallback
+          src={pkg.image}
+          alt={pkg.title}
+          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/35 via-black/5 to-transparent" />
+
+        {/* BUNDLE ribbon — top-left */}
+        <div
+          className="absolute top-3 left-3 px-2.5 py-1 rounded-full flex items-center gap-1 backdrop-blur-md"
+          style={{ backgroundColor: "rgba(255,255,255,0.95)" }}
+        >
+          <span className="text-[10px]">🎁</span>
+          <span
+            className="font-['Lexend',sans-serif] font-extrabold text-[10px] tracking-[0.6px]"
+            style={{ color: pkg.iconColor }}
+          >
+            BUNDLE
+          </span>
+        </div>
+
+        {/* Save % badge — top-right */}
+        <span className="absolute top-3 right-3 bg-[#15803D] text-white font-['Lexend',sans-serif] font-bold text-[10px] px-2.5 py-1 rounded-full">
+          {pkg.save}
+        </span>
+
+        {/* Icon circle — bottom-left */}
+        <div
+          className="absolute bottom-3 left-3 size-9 rounded-full flex items-center justify-center shadow-md"
+          style={{ backgroundColor: pkg.iconBg }}
+        >
+          <svg width="16" height="16" viewBox="0 0 40 40" fill="none">
+            <path d={pkg.iconPath} fill={pkg.iconColor} />
+          </svg>
+        </div>
+      </div>
+
+      {/* Content area */}
+      <div className={`flex flex-col flex-1 ${isFeatured ? "p-5 md:p-7 gap-3" : "p-4 gap-2"}`}>
+        <h4 className={`font-['Lexend',sans-serif] font-bold text-[#0f172a] leading-[1.2] ${isFeatured ? "text-[22px] md:text-[26px]" : "text-[14px]"}`}>
+          {pkg.title}
+        </h4>
+
+        <p className={`font-['Inter',sans-serif] text-[#64748b] whitespace-pre-line ${isFeatured ? "text-[14px] leading-[20px] line-clamp-3" : "text-[11px] leading-[15px] line-clamp-2"}`}>
+          {pkg.description}
+        </p>
+
+        {/* Price + CTA */}
+        <div className={`flex items-center justify-between mt-auto pt-3 border-t ${isFeatured ? "border-white/60" : "border-[#f1f5f9]"}`}>
+          <div className="flex items-baseline gap-2">
+            <span
+              className={`font-['Lexend',sans-serif] font-extrabold ${isFeatured ? "text-[22px]" : "text-[14px]"}`}
+              style={{ color: pkg.iconColor }}
+            >
+              {pkg.price}
+            </span>
+            <span className={`font-['Inter',sans-serif] text-[#94a3b8] line-through ${isFeatured ? "text-[14px]" : "text-[11px]"}`}>
+              {pkg.originalPrice}
+            </span>
+          </div>
+          <button
+            className={`rounded-full flex items-center justify-center transition-colors text-white ${isFeatured ? "px-5 py-2.5 font-['Lexend',sans-serif] font-bold text-[13px] gap-1.5" : "size-7"}`}
+            style={{ backgroundColor: pkg.iconColor }}
+          >
+            {isFeatured ? (
+              <>
+                Explore
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+              </>
+            ) : (
+              <svg width="12" height="12" viewBox="0 0 13.3333 13.3333" fill="none">
+                <path d={svgPaths.p32510800} fill="white" />
+              </svg>
+            )}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Legacy wrapper for the See-All modal
 function PackageCard({
   pkg,
   onTap,
@@ -219,77 +327,8 @@ function PackageCard({
   compact?: boolean;
 }) {
   return (
-    <div
-      onClick={onTap}
-      className={`relative rounded-[20px] overflow-hidden hover:shadow-lg transition-shadow cursor-pointer shrink-0 active:scale-[0.98] flex flex-col ${
-        compact ? "w-full" : "w-[220px] md:w-auto"
-      }`}
-      style={{
-        border: `1px solid ${pkg.borderColor}`,
-        boxShadow: "0px 1px 2px 0px rgba(0,0,0,0.05)",
-      }}
-    >
-      {/* Banner image */}
-      <div className="relative w-full h-[100px] overflow-hidden">
-        <ImageWithFallback
-          src={pkg.image}
-          alt={pkg.title}
-          className="w-full h-full object-cover"
-        />
-        {/* Gradient overlay for readability */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
-        {/* Save badge */}
-        <span className="absolute top-2.5 right-2.5 bg-[#dcfce7] text-[#15803d] font-['Lexend',sans-serif] font-bold text-[10px] px-2 py-0.5 rounded-full leading-[14px]">
-          {pkg.save}
-        </span>
-        {/* Icon circle */}
-        <div
-          className="absolute bottom-2.5 left-3 size-8 rounded-full flex items-center justify-center shadow-sm"
-          style={{ backgroundColor: pkg.iconBg }}
-        >
-          <svg width="14" height="14" viewBox="0 0 40 40" fill="none">
-            <path d={pkg.iconPath} fill={pkg.iconColor} />
-          </svg>
-        </div>
-      </div>
-
-      {/* Content area */}
-      <div
-        className="flex flex-col flex-1 px-3.5 pt-2.5 pb-3"
-        style={{ backgroundImage: pkg.gradient }}
-      >
-        {/* Title */}
-        <h4 className="font-['Lexend',sans-serif] font-bold text-[14px] text-[#0f172a] leading-[20px]">
-          {pkg.title}
-        </h4>
-
-        {/* Description */}
-        <p className="font-['Inter',sans-serif] font-normal text-[11px] text-[#64748b] leading-[15px] mt-1 whitespace-pre-line line-clamp-2">
-          {pkg.description}
-        </p>
-
-        {/* Price row */}
-        <div className="flex items-center justify-between mt-auto pt-2.5 border-t border-[#f1f5f9]">
-          <div className="flex flex-col gap-[0.5px]">
-            <span className="font-['Lexend',sans-serif] font-normal text-[11px] text-[#94a3b8] line-through leading-[14px]">
-              {pkg.originalPrice}
-            </span>
-            <span className="font-['Lexend',sans-serif] font-bold text-[13px] text-[#1975d2] leading-[18px]">
-              {pkg.price}
-            </span>
-          </div>
-          <button className="bg-[#1975d2] rounded-full p-[5px] flex items-center justify-center hover:bg-[#1565b8] transition-colors cursor-pointer">
-            <svg
-              width="12"
-              height="12"
-              viewBox="0 0 13.3333 13.3333"
-              fill="none"
-            >
-              <path d={svgPaths.p32510800} fill="white" />
-            </svg>
-          </button>
-        </div>
-      </div>
+    <div className={compact ? "w-full" : "w-[260px] shrink-0"}>
+      <BentoPackageCard pkg={pkg} onTap={onTap} size="compact" />
     </div>
   );
 }
@@ -395,47 +434,72 @@ export function CarePackages() {
     );
   }
 
+  // Featured package + 4 smaller ones for the bento grid
+  const featured = packages[0];
+  const others = packages.slice(1, 5);
+
   return (
     <div>
-      <div className="flex items-center justify-between px-1 mb-3">
-        <h3 className="font-['Lexend',sans-serif] font-bold text-[14px] text-[#64748b] tracking-[0.7px] uppercase leading-[20px]">
-          Care Packages
-        </h3>
+      <div className="flex items-end justify-between mb-5">
+        <div className="flex flex-col gap-1">
+          <span className="font-['Lexend',sans-serif] font-semibold text-[12px] tracking-[1px] text-[#1975D2] uppercase">
+            Save More with Bundles
+          </span>
+          <h2 className="font-['Lexend',sans-serif] font-extrabold text-[24px] md:text-[30px] text-[#0f172a] leading-[1.2] tracking-[-0.4px]">
+            Care Packages
+          </h2>
+        </div>
         <button
           onClick={() => setShowAll(true)}
-          className="font-['Lexend',sans-serif] font-medium text-[14px] text-[#1975d2] hover:underline cursor-pointer leading-[20px]"
+          className="font-['Lexend',sans-serif] font-semibold text-[13px] text-[#1975d2] hover:underline cursor-pointer flex items-center gap-0.5"
         >
           See All
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6"/></svg>
         </button>
       </div>
 
-      {/* Mobile: horizontal scroll — show first 6 */}
-      <div
-        className="flex md:hidden gap-4 overflow-x-auto pb-2 -mx-4 px-4"
-        style={
-          {
+      {/* Mobile: featured first, then horizontal scroll */}
+      <div className="md:hidden flex flex-col gap-4">
+        <BentoPackageCard
+          pkg={featured}
+          onTap={() => handleCardTap(featured.title)}
+          size="compact"
+        />
+        <div
+          className="flex gap-4 overflow-x-auto pb-2 -mx-4 px-4"
+          style={{
             scrollbarWidth: "none",
             WebkitOverflowScrolling: "touch",
-          } as React.CSSProperties
-        }
-      >
-        {packages.slice(0, 6).map((pkg) => (
-          <PackageCard
-            key={pkg.title}
-            pkg={pkg}
-            onTap={() => handleCardTap(pkg.title)}
-          />
-        ))}
+          } as React.CSSProperties}
+        >
+          {others.map((pkg) => (
+            <div key={pkg.title} className="w-[260px] shrink-0">
+              <BentoPackageCard pkg={pkg} onTap={() => handleCardTap(pkg.title)} size="compact" />
+            </div>
+          ))}
+        </div>
       </div>
 
-      {/* Desktop: 3-col grid — show first 6 (2 rows) */}
-      <div className="hidden md:grid grid-cols-3 gap-5">
-        {packages.slice(0, 6).map((pkg) => (
-          <PackageCard
-            key={pkg.title}
-            pkg={pkg}
-            onTap={() => handleCardTap(pkg.title)}
+      {/* Desktop: bento grid — 1 big (2×2) + 4 smaller (2×2 sub-grid) */}
+      <div className="hidden md:grid grid-cols-4 grid-rows-2 gap-4 md:gap-5" style={{ minHeight: "560px" }}>
+        {/* Featured card — spans 2 cols × 2 rows */}
+        <div className="col-span-2 row-span-2">
+          <BentoPackageCard
+            pkg={featured}
+            onTap={() => handleCardTap(featured.title)}
+            size="featured"
           />
+        </div>
+
+        {/* 4 smaller cards — each 1×1, arranged in 2×2 to the right */}
+        {others.map((pkg) => (
+          <div key={pkg.title} className="col-span-1 row-span-1">
+            <BentoPackageCard
+              pkg={pkg}
+              onTap={() => handleCardTap(pkg.title)}
+              size="small"
+            />
+          </div>
         ))}
       </div>
 

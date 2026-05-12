@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "motion/react";
+import { logger } from "../../lib/logger";
 import {
   X,
   ChevronLeft,
@@ -276,7 +277,7 @@ export function PaymentFlow({
       const result = await dataService.validatePromoCode(promoCode);
       setPromoResult(result);
     } catch (err) {
-      console.warn("[PaymentFlow] validatePromoCode network error:", err);
+      logger.warn("[PaymentFlow] validatePromoCode network error:", err);
       setPromoResult({ valid: false, message: "Network error — please try again" });
     }
     setPromoLoading(false);
@@ -290,7 +291,7 @@ export function PaymentFlow({
       const result = await dataService.verifyUpiId(upiId);
       setUpiVerified(result);
     } catch (err) {
-      console.warn("[PaymentFlow] verifyUpiId network error:", err);
+      logger.warn("[PaymentFlow] verifyUpiId network error:", err);
       // Fallback: simulate verified so UX doesn't dead-end in sandbox
       const names = ["Priya Sharma", "Rahul Verma", "Anita Das", "Vikram Singh"];
       const hash = upiId.split("").reduce((a, b) => a + b.charCodeAt(0), 0);
@@ -393,9 +394,9 @@ export function PaymentFlow({
         existingTxns.push(txnRecord);
         localStorage.setItem("ec_transactions", JSON.stringify(existingTxns));
 
-        console.log("[PaymentFlow] Persisted booking + transaction to localStorage");
+        logger.info("[PaymentFlow] Persisted booking + transaction to localStorage");
       } catch (lsErr) {
-        console.warn("[PaymentFlow] localStorage write failed:", lsErr);
+        logger.warn("[PaymentFlow] localStorage write failed:", lsErr);
       }
 
       // Try remote persist only if API is reachable (circuit breaker closed)
@@ -407,14 +408,14 @@ export function PaymentFlow({
           results.forEach((r, i) => {
             const label = i === 0 ? "booking" : "transaction";
             if (r.status === "fulfilled") {
-              console.log(`[PaymentFlow] Synced ${label} to server`);
+              logger.info(`[PaymentFlow] Synced ${label} to server`);
             } else {
-              console.warn(`[PaymentFlow] Server sync failed for ${label} (data safe in localStorage)`);
+              logger.warn(`[PaymentFlow] Server sync failed for ${label} (data safe in localStorage)`);
             }
           });
         });
       } else {
-        console.log("[PaymentFlow] API circuit open — skipping remote persist (data safe in localStorage)");
+        logger.info("[PaymentFlow] API circuit open — skipping remote persist (data safe in localStorage)");
       }
 
       // Navigate to confirmed screen
@@ -436,7 +437,7 @@ export function PaymentFlow({
       a.rel = "noopener noreferrer";
     } catch {
       // API unreachable — receipt is cosmetic in sandbox
-      console.warn("[PaymentFlow] Receipt generation unavailable offline");
+      logger.warn("[PaymentFlow] Receipt generation unavailable offline");
     }
     setTimeout(() => setDownloading(false), 1000);
   };

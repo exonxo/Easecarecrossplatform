@@ -11,6 +11,7 @@ import { PaymentFlow, type PaymentProvider, type PaymentBookingDetails } from ".
 import { requirementsApi } from "../../services/api";
 import { useBooking } from "../../context/BookingContext";
 import { PrimaryButton } from "../shared/PrimaryButton";
+import { logger } from "../../lib/logger";
 
 // ─── Flow states ───
 type FlowState =
@@ -72,8 +73,8 @@ function BidSuccessScreen({
         language: data.language,
         status: "active",
       })
-      .then(() => console.log("[BidSuccess] Requirement persisted to Supabase"))
-      .catch((err) => console.warn("[BidSuccess] Failed to persist requirement:", err));
+      .then(() => logger.info("[BidSuccess] Requirement persisted to Supabase"))
+      .catch((err) => logger.warn("[BidSuccess] Failed to persist requirement:", err));
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const rows = [

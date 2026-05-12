@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router";
 import { AnimatePresence, motion } from "motion/react";
+import { logger } from "../../lib/logger";
 import {
   Clock,
   ChevronRight,
@@ -1153,8 +1154,8 @@ export function BookingsPage() {
     setShowSubmittedAlert(true);
     dataService
       .createIssue({ bookingId: ticket.bookingId, category: ticket.category, priority: ticket.priority, description: ticket.description, providerName: ticket.providerName })
-      .then(({ id }) => console.log(`[BookingsPage] Issue ${id} persisted`))
-      .catch((err) => console.warn("[BookingsPage] Failed to persist issue:", err));
+      .then(({ id }) => logger.info(`[BookingsPage] Issue ${id} persisted`))
+      .catch((err) => logger.warn("[BookingsPage] Failed to persist issue:", err));
   };
 
   const handleRate = (id: string, rating: number) => {

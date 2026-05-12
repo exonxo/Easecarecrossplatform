@@ -279,7 +279,7 @@ export function ChatModal({ isOpen, onClose }: ChatModalProps) {
                 </div>
                 <div>
                   <h3 className="font-['Lexend',sans-serif] font-semibold text-[16px] text-[#0f172a]">
-                    EasyCare Support
+                    EaseCare Support
                   </h3>
                   <motion.div
                     initial={{ opacity: 0, x: -10 }}
