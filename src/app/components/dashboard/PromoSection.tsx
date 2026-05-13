@@ -124,8 +124,11 @@ export function PromoSection() {
         </div>
 
         {/* RIGHT — pre-designed hero pricing panel image */}
-        <div
-          className="flex-1 relative rounded-[18px] overflow-hidden bg-[#1975D2]"
+        <button
+          type="button"
+          onClick={handlePostRequirement}
+          aria-label="Post your requirement — book a verified caregiver"
+          className="flex-1 relative rounded-[18px] overflow-hidden bg-[#1975D2] cursor-pointer transition-transform hover:scale-[1.01] active:scale-[0.99]"
           style={{ aspectRatio: "1740 / 1240" }}
         >
           <img
@@ -133,7 +136,7 @@ export function PromoSection() {
             alt="Better pricing for every home — Platform fee only 10%"
             className="absolute inset-0 w-full h-full object-cover"
           />
-        </div>
+        </button>
 
         </div>
       </div>
@@ -151,13 +154,18 @@ export function PromoSection() {
         </div>
 
         {/* Hero pricing panel image — mobile */}
-        <div className="relative rounded-[18px] overflow-hidden bg-[#1975D2] w-full">
+        <button
+          type="button"
+          onClick={handlePostRequirement}
+          aria-label="Post your requirement — book a verified caregiver"
+          className="relative rounded-[18px] overflow-hidden bg-[#1975D2] w-full cursor-pointer active:scale-[0.99] transition-transform"
+        >
           <img
             src="/hero-pricing-panel.webp"
             alt="Better pricing for every home — Platform fee only 10%"
             className="w-full h-auto block"
           />
-        </div>
+        </button>
 
         {/* Service selector card */}
         <div
