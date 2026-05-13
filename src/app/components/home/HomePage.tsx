@@ -35,8 +35,11 @@ export function HomePage() {
           {/* 7 ── TESTIMONIALS — real stories with video thumbnails */}
           <CommunitySection />
 
-          {/* 8 ── APP DOWNLOAD CTA strip */}
-          <AppDownloadCTA />
+          {/* 8 ── APP DOWNLOAD CTA strip — hidden on mobile
+                 (MobileAppPrompt bottom sheet handles that audience) */}
+          <div className="hidden md:block">
+            <AppDownloadCTA />
+          </div>
 
         </div>
       </main>
