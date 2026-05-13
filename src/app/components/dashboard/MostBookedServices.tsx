@@ -1,11 +1,7 @@
-import { useRef, useState } from "react";
+import { useRef } from "react";
 import { useNavigate } from "react-router";
 import { ChevronRight, Star } from "lucide-react";
 import { motion } from "motion/react";
-import { useRequireAuth } from "../../hooks/useRequireAuth";
-import { LoginModal } from "../auth/LoginModal";
-import { ServiceBookingPopup, type ServiceItem, type ServiceCategory } from "./ServiceBookingPopup";
-import { useBooking } from "../../context/BookingContext";
 
 // ─── Data ─────────────────────────────────────────────────────────────────────
 
@@ -15,6 +11,18 @@ const POPULAR: Badge   = { label: "🔥 Popular",   bg: "#FFEDD5", color: "#C241
 const TRENDING: Badge  = { label: "📈 Trending",  bg: "#DBEAFE", color: "#1E40AF" };
 const TOP_RATED: Badge = { label: "⭐ Top Rated", bg: "#FEF3C7", color: "#92400E" };
 const NEW_BADGE: Badge = { label: "✨ New",       bg: "#DCFCE7", color: "#15803D" };
+
+// Maps the short tag used on each card to the canonical category label used
+// across the rest of the app (categories array in QuickCategories.tsx).
+// Keep these aligned — they drive the deep-link into /services?category=…
+const CATEGORY_NAV_MAP: Record<string, string> = {
+  "Elder Care":  "Elder Care",
+  "Nursing":     "Home Nursing",
+  "Baby Care":   "Baby Care",
+  "Physio":      "Physiotherapy",
+  "Cleaning":    "Housekeeping",
+  "Cooking":     "Personal Chef",
+};
 
 const SERVICES = [
   {
@@ -111,16 +119,16 @@ const SERVICES = [
 
 function ServiceCard({
   service,
-  onBook,
+  onOpen,
 }: {
   service: (typeof SERVICES)[0];
-  onBook: (service: (typeof SERVICES)[0]) => void;
+  onOpen: () => void;
 }) {
   return (
     <motion.div
       whileHover={{ y: -3, boxShadow: "0 12px 28px rgba(0,0,0,0.10)" }}
       transition={{ type: "spring", stiffness: 400, damping: 28 }}
-      onClick={() => onBook(service)}
+      onClick={onOpen}
       className="flex flex-col shrink-0 cursor-pointer bg-white rounded-[16px] overflow-hidden"
       style={{
         width: 220,
@@ -181,84 +189,17 @@ function ServiceCard({
   );
 }
 
-// ─── Category color mapping (visual only, for the booking popup header) ──────
-
-const CATEGORY_STYLE: Record<string, { color: string; bg: string }> = {
-  "Elder Care": { color: "#2563EB", bg: "#EEF2FF" },
-  "Nursing":    { color: "#E11D48", bg: "#FFE4E6" },
-  "Baby Care":  { color: "#9333EA", bg: "#FAF5FF" },
-  "Physio":     { color: "#4F46E5", bg: "#EEF2FF" },
-  "Cleaning":   { color: "#059669", bg: "#ECFDF5" },
-  "Cooking":    { color: "#EA580C", bg: "#FFF7ED" },
-};
-
-// Generic circle icon path
-const DEFAULT_ICON = "M20 4a16 16 0 100 32 16 16 0 000-32z";
-
 // ─── Main export ──────────────────────────────────────────────────────────────
-
-type SelectedService = (typeof SERVICES)[0];
 
 export function MostBookedServices() {
   const navigate = useNavigate();
-  const { setBookedProvider } = useBooking();
-  const { requireAuth, loginOpen, setLoginOpen } = useRequireAuth();
-  const [selected, setSelected] = useState<SelectedService | null>(null);
-  const [popupOpen, setPopupOpen] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  const handleBook = (service: SelectedService) => {
-    requireAuth(() => {
-      setSelected(service);
-      setPopupOpen(true);
-    });
-  };
-
-  const handleClose = () => {
-    setPopupOpen(false);
-    setSelected(null);
-  };
-
-  // Convert the clicked service into the ServiceItem shape the popup expects
-  const serviceItem: ServiceItem | null = selected
-    ? {
-        name: selected.name,
-        description: `${selected.category} · ${selected.rating}★ rating from ${selected.reviews} families`,
-        price: `${selected.price}${selected.unit}`,
-        duration: selected.unit.replace("/", ""),
-        included: [
-          "Verified, background-checked caregiver",
-          "Real-time location tracking",
-          "Secure in-app payment",
-          "24/7 customer support",
-          "Free cancellation up to 4 hours before",
-        ],
-      }
-    : null;
-
-  const categoryItem: ServiceCategory | null = selected
-    ? {
-        label: selected.category,
-        color: CATEGORY_STYLE[selected.category]?.color ?? "#1975D2",
-        bg: CATEGORY_STYLE[selected.category]?.bg ?? "#EBF3FC",
-        icon: DEFAULT_ICON,
-        viewBox: "0 0 40 40",
-      }
-    : null;
-
-  const handleComplete = (svc: ServiceItem, cat: ServiceCategory) => {
-    // Set booking context so dashboard knows there's an active booking
-    setBookedProvider({
-      providerName: "EaseCare Verified Caregiver",
-      providerPhoto: "",
-      service: svc.name,
-      rating: 4.8,
-      agency: "EaseCare Services",
-      timeSlot: "Scheduled",
-      bidAmount: svc.price,
-    });
-    handleClose();
-    navigate("/");
+  // Clicking a service card takes the user to the Services page with the
+  // matching category tab pre-selected — booking happens on that page.
+  const handleOpen = (service: (typeof SERVICES)[0]) => {
+    const target = CATEGORY_NAV_MAP[service.category] ?? service.category;
+    navigate(`/services?category=${encodeURIComponent(target)}`);
   };
 
   const scrollBy = (dir: number) => {
@@ -266,55 +207,42 @@ export function MostBookedServices() {
   };
 
   return (
-    <>
-      <section className="flex flex-col gap-4">
-        {/* Header */}
-        <div className="flex items-center justify-between">
-          <h2 className="font-['Lexend',sans-serif] font-bold text-[20px] md:text-[22px] text-[#0f172a] leading-[1.3]">
-            Most Booked Services
-          </h2>
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => scrollBy(-1)}
-              aria-label="Scroll services left"
-              className="hidden md:flex size-8 items-center justify-center rounded-full bg-[#f1f5f9] hover:bg-[#e2e8f0] transition-colors cursor-pointer"
-            >
-              <ChevronRight size={16} className="rotate-180 text-[#374151]" aria-hidden="true" />
-            </button>
-            <button
-              onClick={() => scrollBy(1)}
-              aria-label="Scroll services right"
-              className="hidden md:flex size-8 items-center justify-center rounded-full bg-[#f1f5f9] hover:bg-[#e2e8f0] transition-colors cursor-pointer"
-            >
-              <ChevronRight size={16} className="text-[#374151]" aria-hidden="true" />
-            </button>
+    <section className="flex flex-col gap-4">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <h2 className="font-['Lexend',sans-serif] font-bold text-[20px] md:text-[22px] text-[#0f172a] leading-[1.3]">
+          Most Booked Services
+        </h2>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => scrollBy(-1)}
+            aria-label="Scroll services left"
+            className="hidden md:flex size-8 items-center justify-center rounded-full bg-[#f1f5f9] hover:bg-[#e2e8f0] transition-colors cursor-pointer"
+          >
+            <ChevronRight size={16} className="rotate-180 text-[#374151]" aria-hidden="true" />
+          </button>
+          <button
+            onClick={() => scrollBy(1)}
+            aria-label="Scroll services right"
+            className="hidden md:flex size-8 items-center justify-center rounded-full bg-[#f1f5f9] hover:bg-[#e2e8f0] transition-colors cursor-pointer"
+          >
+            <ChevronRight size={16} className="text-[#374151]" aria-hidden="true" />
+          </button>
+        </div>
+      </div>
+
+      {/* Horizontal scroll row — aligned with page padding (no bleed-to-edge) */}
+      <div
+        ref={scrollRef}
+        className="flex gap-4 md:gap-5 overflow-x-auto pb-2"
+        style={{ scrollbarWidth: "none", scrollSnapType: "x mandatory" }}
+      >
+        {SERVICES.map((service) => (
+          <div key={service.name} style={{ scrollSnapAlign: "start" }}>
+            <ServiceCard service={service} onOpen={() => handleOpen(service)} />
           </div>
-        </div>
-
-        {/* Horizontal scroll row — aligned with page padding (no bleed-to-edge) */}
-        <div
-          ref={scrollRef}
-          className="flex gap-4 md:gap-5 overflow-x-auto pb-2"
-          style={{ scrollbarWidth: "none", scrollSnapType: "x mandatory" }}
-        >
-          {SERVICES.map((service) => (
-            <div key={service.name} style={{ scrollSnapAlign: "start" }}>
-              <ServiceCard service={service} onBook={() => handleBook(service)} />
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* Direct booking popup with date picker + checkout + payment */}
-      <ServiceBookingPopup
-        service={serviceItem}
-        category={categoryItem}
-        isOpen={popupOpen}
-        onClose={handleClose}
-        onComplete={handleComplete}
-      />
-
-      <LoginModal open={loginOpen} onOpenChange={setLoginOpen} />
-    </>
+        ))}
+      </div>
+    </section>
   );
 }
