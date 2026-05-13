@@ -18,7 +18,7 @@
  */
 import { useState, useEffect, useRef, useMemo } from "react";
 import { useNavigate, useSearchParams } from "react-router";
-import { ArrowLeft, Search, Clock, Sparkles } from "lucide-react";
+import { ArrowLeft, Search, Clock, Sparkles, Plus } from "lucide-react";
 import { motion } from "motion/react";
 import { ImageWithFallback } from "../figma/ImageWithFallback";
 import {
@@ -35,6 +35,7 @@ import {
 import { useBooking } from "../../context/BookingContext";
 import { useRequireAuth } from "../../hooks/useRequireAuth";
 import { LoginModal } from "../auth/LoginModal";
+import { PostRequirementModal } from "../dashboard/PostRequirementModal";
 
 type Category = (typeof categories)[number];
 
@@ -115,6 +116,9 @@ export function Services() {
   const [bookingService, setBookingService] = useState<ServiceItem | null>(null);
   const [bookingCategory, setBookingCategory] = useState<Category | null>(null);
   const [bookingPopupOpen, setBookingPopupOpen] = useState(false);
+  const [postReqOpen, setPostReqOpen] = useState(false);
+
+  const handlePostRequirement = () => requireAuth(() => setPostReqOpen(true));
 
   const handleBook = (service: ServiceItem, catLabel: string) => {
     const cat = categories.find((c) => c.label === catLabel);
@@ -182,9 +186,18 @@ export function Services() {
           <h1 className="font-['Lexend',sans-serif] font-bold text-[16px] md:text-[18px] text-[#0f172a]">
             {activeCategory ? activeCategory.label : "All Services"}
           </h1>
-          <span className="ml-auto font-['Inter',sans-serif] text-[12px] text-[#94a3b8]">
-            {services.length} {services.length === 1 ? "result" : "results"}
+          <span className="hidden sm:inline font-['Inter',sans-serif] text-[12px] text-[#94a3b8]">
+            · {services.length} {services.length === 1 ? "result" : "results"}
           </span>
+          <button
+            onClick={handlePostRequirement}
+            aria-label="Post your requirement"
+            className="ml-auto flex items-center gap-1.5 bg-[#1975D2] hover:bg-[#1561b0] active:scale-95 text-white font-['Lexend',sans-serif] font-semibold text-[12px] md:text-[13px] px-3 md:px-4 py-2 rounded-full transition-all cursor-pointer shadow-[0_2px_8px_rgba(25,117,210,0.3)]"
+          >
+            <Plus size={14} strokeWidth={2.5} aria-hidden="true" />
+            <span className="hidden sm:inline">Post Requirement</span>
+            <span className="sm:hidden">Post</span>
+          </button>
         </div>
 
         {/* Search */}
@@ -288,6 +301,7 @@ export function Services() {
       />
 
       <LoginModal open={loginOpen} onOpenChange={setLoginOpen} />
+      <PostRequirementModal open={postReqOpen} onOpenChange={setPostReqOpen} />
     </div>
   );
 }
