@@ -9,6 +9,7 @@
  * web users encouraging app install (skipped on desktop / Capacitor / PWA).
  */
 import { RouterProvider } from "react-router";
+import { SpeedInsights } from "@vercel/speed-insights/react";
 import { router } from "./routes";
 import { AuthProvider } from "./context/AuthContext";
 import { BookingProvider } from "./context/BookingContext";
@@ -26,6 +27,7 @@ export default function App() {
             <CapacitorShell>
               <RouterProvider router={router} />
               <MobileAppPrompt />
+              <SpeedInsights />
             </CapacitorShell>
           </ModalProvider>
         </BookingProvider>
