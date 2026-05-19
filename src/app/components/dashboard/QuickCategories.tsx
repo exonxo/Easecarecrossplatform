@@ -30,6 +30,7 @@ export interface ServiceItem {
 
 interface Category {
   label: string;
+  image: string;
   icon: string;
   viewBox: string;
   iconW: number;
@@ -467,15 +468,15 @@ const DEFAULT_SERVICES: ServiceItem[] = [
 
 export const categories: Category[] = [
   // Row 1
-  { label: "Elder Care",     icon: svgPaths.p3f3a9b80,  viewBox: "0 0 28 27.3333",      iconW: 28,     iconH: 27.333, color: "#2563EB", bg: "#eff6ff", border: "rgba(219,234,254,0.6)" },
-  { label: "Home Nursing",   icon: svgPaths.p23d8d00,   viewBox: "0 0 26.6667 26.6667", iconW: 26.667, iconH: 26.667, color: "#E11D48", bg: "#fff1f2", border: "rgba(255,228,230,0.6)" },
-  { label: "Baby Care",      icon: svgPaths.p282fd600,  viewBox: "0 0 24 24",           iconW: 24,     iconH: 24,     color: "#9333EA", bg: "#faf5ff", border: "rgba(243,232,255,0.6)" },
-  { label: "Companion Care", icon: svgPaths.p286fe780,  viewBox: "0 0 21.3333 26.6667", iconW: 21.333, iconH: 26.667, color: "#0D9488", bg: "#f0fdfa", border: "rgba(204,251,241,0.6)" },
+  { label: "Elder Care",     image: "/icon-elder-care.png",     icon: svgPaths.p3f3a9b80,  viewBox: "0 0 28 27.3333",      iconW: 28,     iconH: 27.333, color: "#2563EB", bg: "#eff6ff", border: "rgba(219,234,254,0.6)" },
+  { label: "Home Nursing",   image: "/icon-home-nursing.png",   icon: svgPaths.p23d8d00,   viewBox: "0 0 26.6667 26.6667", iconW: 26.667, iconH: 26.667, color: "#E11D48", bg: "#fff1f2", border: "rgba(255,228,230,0.6)" },
+  { label: "Baby Care",      image: "/icon-baby-care.png",      icon: svgPaths.p282fd600,  viewBox: "0 0 24 24",           iconW: 24,     iconH: 24,     color: "#9333EA", bg: "#faf5ff", border: "rgba(243,232,255,0.6)" },
+  { label: "Companion Care", image: "/icon-companion-care.png", icon: svgPaths.p286fe780,  viewBox: "0 0 21.3333 26.6667", iconW: 21.333, iconH: 26.667, color: "#0D9488", bg: "#f0fdfa", border: "rgba(204,251,241,0.6)" },
   // Row 2
-  { label: "Physiotherapy",  icon: svgPaths.p2d11f400,  viewBox: "0 0 26.4 26.4",       iconW: 26.4,   iconH: 26.4,   color: "#4F46E5", bg: "#eef2ff", border: "rgba(224,231,255,0.6)" },
-  { label: "Housekeeping",   icon: svgPaths.p3eb40d60,  viewBox: "0 0 24 29.3333",      iconW: 24,     iconH: 29.333, color: "#059669", bg: "#ecfdf5", border: "rgba(209,250,229,0.6)" },
-  { label: "Personal Chef",  icon: svgPaths.p3dfaed00,  viewBox: "0 0 20 26.6667",      iconW: 20,     iconH: 26.667, color: "#EA580C", bg: "#fff7ed", border: "rgba(255,237,213,0.6)" },
-  { label: "Pet Care",       icon: svgPaths.p15b38ee0,  viewBox: "0 0 26.6667 25.3333", iconW: 26.667, iconH: 25.333, color: "#D97706", bg: "#fffbeb", border: "rgba(254,243,199,0.6)" },
+  { label: "Physiotherapy",  image: "/icon-physiotherapy.png",  icon: svgPaths.p2d11f400,  viewBox: "0 0 26.4 26.4",       iconW: 26.4,   iconH: 26.4,   color: "#4F46E5", bg: "#eef2ff", border: "rgba(224,231,255,0.6)" },
+  { label: "Housekeeping",   image: "/icon-housekeeping.png",   icon: svgPaths.p3eb40d60,  viewBox: "0 0 24 29.3333",      iconW: 24,     iconH: 29.333, color: "#059669", bg: "#ecfdf5", border: "rgba(209,250,229,0.6)" },
+  { label: "Personal Chef",  image: "/icon-personal-chef.png",  icon: svgPaths.p3dfaed00,  viewBox: "0 0 20 26.6667",      iconW: 20,     iconH: 26.667, color: "#EA580C", bg: "#fff7ed", border: "rgba(255,237,213,0.6)" },
+  { label: "Pet Care",       image: "/icon-pet-care.png",       icon: svgPaths.p15b38ee0,  viewBox: "0 0 26.6667 25.3333", iconW: 26.667, iconH: 25.333, color: "#D97706", bg: "#fffbeb", border: "rgba(254,243,199,0.6)" },
 ];
 
 // ─── Providers pool ───────────────────────────────────────────────────────────
@@ -636,12 +637,10 @@ function CategoryModal({
                 {/* Top row: icon + title + close */}
                 <div className="flex items-center gap-3">
                   <div
-                    className="size-12 rounded-[14px] flex items-center justify-center shrink-0 shadow-sm"
+                    className="size-12 rounded-[14px] flex items-center justify-center overflow-hidden shrink-0 shadow-sm"
                     style={{ backgroundColor: category.bg, border: `1px solid ${category.border}` }}
                   >
-                    <svg width={22} height={22} fill="none" viewBox={category.viewBox}>
-                      <path d={category.icon} fill={category.color} />
-                    </svg>
+                    <img src={category.image} alt={category.label} className="w-8 h-8 object-contain" />
                   </div>
                   <div className="flex-1 min-w-0">
                     <h2 className="font-['Lexend',sans-serif] font-bold text-[20px] text-[#0f172a]">
@@ -820,17 +819,10 @@ export function QuickCategories({ initialCategoryLabel }: { initialCategoryLabel
             >
               {/* Icon circle */}
               <div
-                className="size-14 md:size-16 rounded-full flex items-center justify-center shrink-0 transition-transform group-hover:scale-105"
+                className="size-14 md:size-16 rounded-full flex items-center justify-center overflow-hidden shrink-0 transition-transform group-hover:scale-105"
                 style={{ backgroundColor: cat.bg, border: `1.5px solid ${cat.border}` }}
               >
-                <svg
-                  fill="none"
-                  preserveAspectRatio="xMidYMid meet"
-                  viewBox={cat.viewBox}
-                  style={{ width: cat.iconW * 0.75, height: cat.iconH * 0.75 }}
-                >
-                  <path d={cat.icon} fill={cat.color} />
-                </svg>
+                <img src={cat.image} alt={cat.label} className="w-9 h-9 object-contain" />
               </div>
 
               {/* Label */}
@@ -861,6 +853,7 @@ export function QuickCategories({ initialCategoryLabel }: { initialCategoryLabel
                 bg: bookingCategory.bg,
                 icon: bookingCategory.icon,
                 viewBox: bookingCategory.viewBox,
+                image: bookingCategory.image,
               }
             : null
         }

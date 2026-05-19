@@ -1,10 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router";
 import { motion } from "motion/react";
-import {
-  ChevronRight, Users, Heart, Baby, HeartHandshake,
-  Dumbbell, Sparkles, ChefHat, PawPrint,
-} from "lucide-react";
 import { useRequireAuth } from "../../hooks/useRequireAuth";
 import { LoginModal } from "../auth/LoginModal";
 import { PostRequirementModal } from "./PostRequirementModal";
@@ -13,15 +9,15 @@ import { PostRequirementModal } from "./PostRequirementModal";
 
 const CATEGORIES = [
   // Row 1
-  { icon: Users,          label: "Elder Care",      color: "#2563EB", bg: "#EEF2FF", border: "rgba(219,234,254,0.6)" },
-  { icon: Heart,          label: "Home Nursing",    color: "#E11D48", bg: "#FFF1F2", border: "rgba(254,205,211,0.6)" },
-  { icon: Baby,           label: "Baby Care",       color: "#9333EA", bg: "#FAF5FF", border: "rgba(243,232,255,0.6)" },
-  { icon: HeartHandshake, label: "Companion Care",  color: "#0D9488", bg: "#F0FDFA", border: "rgba(204,251,241,0.6)" },
+  { image: "/icon-elder-care.png",      label: "Elder Care",     bg: "#EEF2FF", border: "rgba(219,234,254,0.6)" },
+  { image: "/icon-home-nursing.png",    label: "Home Nursing",   bg: "#FFF1F2", border: "rgba(254,205,211,0.6)" },
+  { image: "/icon-baby-care.png",       label: "Baby Care",      bg: "#FAF5FF", border: "rgba(243,232,255,0.6)" },
+  { image: "/icon-companion-care.png",  label: "Companion Care", bg: "#F0FDFA", border: "rgba(204,251,241,0.6)" },
   // Row 2
-  { icon: Dumbbell,       label: "Physiotherapy",   color: "#4F46E5", bg: "#EEF2FF", border: "rgba(224,231,255,0.6)" },
-  { icon: Sparkles,       label: "Housekeeping",    color: "#059669", bg: "#ECFDF5", border: "rgba(209,250,229,0.6)" },
-  { icon: ChefHat,        label: "Personal Chef",   color: "#EA580C", bg: "#FFF7ED", border: "rgba(255,237,213,0.6)" },
-  { icon: PawPrint,       label: "Pet Care",        color: "#D97706", bg: "#FFFBEB", border: "rgba(254,243,199,0.6)" },
+  { image: "/icon-physiotherapy.png",   label: "Physiotherapy",  bg: "#EEF2FF", border: "rgba(224,231,255,0.6)" },
+  { image: "/icon-housekeeping.png",    label: "Housekeeping",   bg: "#ECFDF5", border: "rgba(209,250,229,0.6)" },
+  { image: "/icon-personal-chef.png",   label: "Personal Chef",  bg: "#FFF7ED", border: "rgba(255,237,213,0.6)" },
+  { image: "/icon-pet-care.png",        label: "Pet Care",       bg: "#FFFBEB", border: "rgba(254,243,199,0.6)" },
 ];
 
 // ─── Checkmark icon for bullet points ────────────────────────────────────────
@@ -85,7 +81,7 @@ export function PromoSection() {
 
             {/* 2×4 category grid */}
             <div className="grid grid-cols-4 gap-3">
-              {CATEGORIES.map(({ icon: Icon, label, color, bg, border }) => (
+              {CATEGORIES.map(({ image, label, bg, border }) => (
                 <motion.button
                   key={label}
                   whileHover={{ y: -2, boxShadow: "0px 4px 7px rgba(0,0,0,0.10)" }}
@@ -100,10 +96,10 @@ export function PromoSection() {
                   }}
                 >
                   <div
-                    className="w-16 h-16 rounded-full flex items-center justify-center"
+                    className="w-16 h-16 rounded-full flex items-center justify-center overflow-hidden"
                     style={{ backgroundColor: bg }}
                   >
-                    <Icon size={22} style={{ color }} strokeWidth={1.8} />
+                    <img src={image} alt={label} className="w-10 h-10 object-contain" />
                   </div>
                   <span className="font-['Lexend',sans-serif] font-semibold text-[12px] text-[#1e293b] text-center leading-[16px]">
                     {label}
@@ -176,7 +172,7 @@ export function PromoSection() {
             What are you looking for?
           </p>
           <div className="grid grid-cols-4 gap-2">
-            {CATEGORIES.map(({ icon: Icon, label, color, bg }) => (
+            {CATEGORIES.map(({ image, label, bg }) => (
               <button
                 key={label}
                 onClick={() => handleCategoryClick(label)}
@@ -184,8 +180,8 @@ export function PromoSection() {
                 className="flex flex-col items-center gap-1.5 rounded-[16px] py-3 px-1 cursor-pointer active:scale-95 transition-transform"
                 style={{ backgroundColor: bg }}
               >
-                <div className="w-10 h-10 rounded-full flex items-center justify-center bg-white/60">
-                  <Icon size={16} style={{ color }} strokeWidth={2} />
+                <div className="w-10 h-10 rounded-full flex items-center justify-center bg-white/60 overflow-hidden">
+                  <img src={image} alt={label} className="w-7 h-7 object-contain" />
                 </div>
                 <span className="font-['Lexend',sans-serif] font-semibold text-[10px] text-[#1e293b] text-center leading-[13px]">
                   {label}

@@ -244,12 +244,12 @@ export function Services() {
                       className={isActive ? "text-white" : "text-[#1975D2]"}
                     />
                   ) : (
-                    <svg width={14} height={14} fill="none" viewBox={(cat as Category).viewBox}>
-                      <path
-                        d={(cat as Category).icon}
-                        fill={isActive ? "white" : (cat as Category).color}
-                      />
-                    </svg>
+                    <img
+                      src={(cat as Category).image}
+                      alt={(cat as Category).label}
+                      className="w-4 h-4 object-contain"
+                      style={isActive ? { filter: "brightness(0) invert(1)" } : undefined}
+                    />
                   )}
                   {cat.label}
                 </button>
@@ -288,6 +288,7 @@ export function Services() {
                 bg: bookingCategory.bg,
                 icon: bookingCategory.icon,
                 viewBox: bookingCategory.viewBox,
+                image: bookingCategory.image,
               }
             : null
         }
