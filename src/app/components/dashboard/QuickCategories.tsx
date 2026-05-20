@@ -636,12 +636,7 @@ function CategoryModal({
               >
                 {/* Top row: icon + title + close */}
                 <div className="flex items-center gap-3">
-                  <div
-                    className="size-12 rounded-[14px] flex items-center justify-center overflow-hidden shrink-0 shadow-sm"
-                    style={{ backgroundColor: category.bg, border: `1px solid ${category.border}` }}
-                  >
-                    <img src={category.image} alt={category.label} className="w-8 h-8 object-contain" />
-                  </div>
+                  <img src={category.image} alt={category.label} className="w-12 h-12 object-contain shrink-0" />
                   <div className="flex-1 min-w-0">
                     <h2 className="font-['Lexend',sans-serif] font-bold text-[20px] text-[#0f172a]">
                       {category.label}
@@ -817,13 +812,12 @@ export function QuickCategories({ initialCategoryLabel }: { initialCategoryLabel
               onClick={() => handleCategoryClick(cat)}
               className="group flex flex-col items-center gap-2.5 py-5 md:py-6 px-2 bg-white rounded-[20px] border border-[#f1f5f9] shadow-[0_1px_4px_rgba(0,0,0,0.05)] hover:shadow-[0_6px_20px_rgba(0,0,0,0.08)] hover:border-[#e2e8f0] active:scale-[0.97] transition-all cursor-pointer"
             >
-              {/* Icon circle */}
-              <div
-                className="size-14 md:size-16 rounded-full flex items-center justify-center overflow-hidden shrink-0 transition-transform group-hover:scale-105"
-                style={{ backgroundColor: cat.bg, border: `1.5px solid ${cat.border}` }}
-              >
-                <img src={cat.image} alt={cat.label} className="w-9 h-9 object-contain" />
-              </div>
+              {/* Icon */}
+              <img
+                src={cat.image}
+                alt={cat.label}
+                className="w-12 h-12 md:w-14 md:h-14 object-contain shrink-0 transition-transform group-hover:scale-105"
+              />
 
               {/* Label */}
               <span className="font-['Lexend',sans-serif] font-semibold text-[11px] md:text-[12px] text-[#1e293b] text-center leading-[16px] group-hover:text-[#1975D2] transition-colors">

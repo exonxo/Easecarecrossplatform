@@ -95,12 +95,7 @@ export function PromoSection() {
                     boxShadow: "0px 1px 2px rgba(0,0,0,0.05)",
                   }}
                 >
-                  <div
-                    className="w-16 h-16 rounded-full flex items-center justify-center overflow-hidden"
-                    style={{ backgroundColor: bg }}
-                  >
-                    <img src={image} alt={label} className="w-10 h-10 object-contain" />
-                  </div>
+                  <img src={image} alt={label} className="w-14 h-14 object-contain" />
                   <span className="font-['Lexend',sans-serif] font-semibold text-[12px] text-[#1e293b] text-center leading-[16px]">
                     {label}
                   </span>
@@ -172,17 +167,14 @@ export function PromoSection() {
             What are you looking for?
           </p>
           <div className="grid grid-cols-4 gap-2">
-            {CATEGORIES.map(({ image, label, bg }) => (
+            {CATEGORIES.map(({ image, label }) => (
               <button
                 key={label}
                 onClick={() => handleCategoryClick(label)}
                 aria-label={`Browse ${label} services`}
                 className="flex flex-col items-center gap-1.5 rounded-[16px] py-3 px-1 cursor-pointer active:scale-95 transition-transform"
-                style={{ backgroundColor: bg }}
               >
-                <div className="w-10 h-10 rounded-full flex items-center justify-center bg-white/60 overflow-hidden">
-                  <img src={image} alt={label} className="w-7 h-7 object-contain" />
-                </div>
+                <img src={image} alt={label} className="w-12 h-12 object-contain" />
                 <span className="font-['Lexend',sans-serif] font-semibold text-[10px] text-[#1e293b] text-center leading-[13px]">
                   {label}
                 </span>

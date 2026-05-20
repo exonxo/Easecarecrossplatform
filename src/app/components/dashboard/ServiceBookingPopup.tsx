@@ -197,18 +197,18 @@ export function ServiceBookingPopup({
 
               {/* Service hero */}
               <div className="mx-4 mb-4 flex gap-3">
-                <div
-                  className="w-[56px] h-[56px] rounded-[14px] flex items-center justify-center overflow-hidden shrink-0"
-                  style={{ backgroundColor: category.bg }}
-                >
-                  {category.image ? (
-                    <img src={category.image} alt={category.label} className="w-9 h-9 object-contain" />
-                  ) : (
+                {category.image ? (
+                  <img src={category.image} alt={category.label} className="w-14 h-14 object-contain shrink-0" />
+                ) : (
+                  <div
+                    className="w-[56px] h-[56px] rounded-[14px] flex items-center justify-center shrink-0"
+                    style={{ backgroundColor: category.bg }}
+                  >
                     <svg width={24} height={24} fill="none" viewBox={category.viewBox}>
                       <path d={category.icon} fill={category.color} />
                     </svg>
-                  )}
-                </div>
+                  </div>
+                )}
                 <div className="flex-1 min-w-0 py-0.5">
                   <h3 className="font-['Inter',sans-serif] font-bold text-[16px] text-[#111827] leading-[22px]">
                     {service.name}
