@@ -38,7 +38,7 @@ const STEPS = [
 
 export function HowItWorks() {
   return (
-    <section className="flex flex-col gap-6">
+    <section className="rounded-[22px] bg-[#F0F7FA] px-5 py-8 md:px-8 md:py-10 flex flex-col gap-6">
       {/* Header */}
       <div className="flex flex-col gap-1.5 text-center md:text-left">
         <span className="font-['Lexend',sans-serif] font-semibold text-[12px] tracking-[1px] text-[#1975D2] uppercase">
@@ -58,8 +58,7 @@ export function HowItWorks() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-50px" }}
             transition={{ delay: i * 0.1, duration: 0.4 }}
-            className="relative bg-white rounded-[18px] border border-[#eef2f7] p-5 md:p-6 flex flex-col gap-3 transition-shadow hover:shadow-[0_8px_24px_rgba(15,23,42,0.08)]"
-            style={{ boxShadow: "0px 2px 8px rgba(15,23,42,0.04)" }}
+            className="relative rounded-[18px] p-5 md:p-6 flex flex-col gap-3"
           >
             {/* Step number — large faded */}
             <span

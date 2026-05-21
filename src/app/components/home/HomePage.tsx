@@ -4,7 +4,6 @@ import { StatsBar } from "./StatsBar";
 import { MostBookedServices } from "./MostBookedServices";
 import { HowItWorks } from "./HowItWorks";
 import { CarePackages } from "./CarePackages";
-import { HeroBanner } from "./HeroBanner";
 import { CommunitySection } from "./CommunitySection";
 import { AppDownloadCTA } from "./AppDownloadCTA";
 
@@ -29,10 +28,7 @@ export function HomePage() {
           {/* 5 ── CARE PACKAGES — Bento grid (1 featured + 4 smaller) */}
           <CarePackages />
 
-          {/* 6 ── PROMO BANNERS (auto-rotating, full width) */}
-          <HeroBanner />
-
-          {/* 7 ── TESTIMONIALS — real stories with video thumbnails */}
+          {/* 6 ── TESTIMONIALS — real stories with video thumbnails */}
           <CommunitySection />
 
           {/* 8 ── APP DOWNLOAD CTA strip — hidden on mobile

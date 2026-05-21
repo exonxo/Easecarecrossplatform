@@ -1,9 +1,19 @@
-import { useState } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useNavigate } from "react-router";
-import { motion } from "motion/react";
+import { motion, AnimatePresence } from "motion/react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useRequireAuth } from "../../hooks/useRequireAuth";
 import { LoginModal } from "../auth/LoginModal";
 import { PostRequirementModal } from "./PostRequirementModal";
+
+// ─── Rotating hero banner images ─────────────────────────────────────────────
+
+const HERO_BANNERS = [
+  "/Banner 1-Hero.webp",
+  "/Banner 2-Hero.webp",
+  "/Banner 3-Hero.webp",
+  "/Banner 4-Hero.webp",
+];
 
 // ─── Service categories (matches Figma 2×4 grid exactly) ─────────────────────
 
@@ -37,6 +47,32 @@ export function PromoSection() {
   const navigate = useNavigate();
   const { requireAuth, loginOpen, setLoginOpen } = useRequireAuth();
   const [postReqOpen, setPostReqOpen] = useState(false);
+
+  // ── Hero banner carousel ──────────────────────────────────────────────────
+  const [heroCurrent, setHeroCurrent] = useState(0);
+  const [direction, setDirection] = useState(1);
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  const goTo = useCallback((index: number, dir: number) => {
+    setDirection(dir);
+    setHeroCurrent((index + HERO_BANNERS.length) % HERO_BANNERS.length);
+  }, []);
+
+  const resetTimer = useCallback(() => {
+    if (timerRef.current) clearInterval(timerRef.current);
+    timerRef.current = setInterval(() => {
+      setDirection(1);
+      setHeroCurrent((c) => (c + 1) % HERO_BANNERS.length);
+    }, 6000);
+  }, []);
+
+  useEffect(() => {
+    resetTimer();
+    return () => { if (timerRef.current) clearInterval(timerRef.current); };
+  }, [resetTimer]);
+
+  const heroPrev = () => { goTo(heroCurrent - 1, -1); resetTimer(); };
+  const heroNext = () => { goTo(heroCurrent + 1,  1); resetTimer(); };
 
   // Opens the Post Requirement modal — ONLY for the "Tell us what you need" link
   const handlePostRequirement = () => requireAuth(() => setPostReqOpen(true));
@@ -114,20 +150,46 @@ export function PromoSection() {
           </div>
         </div>
 
-        {/* RIGHT — pre-designed hero pricing panel image */}
-        <button
-          type="button"
-          onClick={handlePostRequirement}
-          aria-label="Post your requirement — book a verified caregiver"
-          className="flex-1 relative rounded-[18px] overflow-hidden bg-[#1975D2] cursor-pointer transition-transform hover:scale-[1.01] active:scale-[0.99]"
+        {/* RIGHT — rotating hero banner carousel */}
+        <div
+          className="flex-1 relative rounded-[18px] overflow-hidden bg-[#1975D2] group"
           style={{ aspectRatio: "1740 / 1240" }}
         >
-          <img
-            src="/hero-pricing-panel.webp"
-            alt="Better pricing for every home — Platform fee only 10%"
-            className="absolute inset-0 w-full h-full object-cover"
-          />
-        </button>
+          <AnimatePresence initial={false} custom={direction} mode="popLayout">
+            <motion.div
+              key={heroCurrent}
+              custom={direction}
+              initial={{ x: direction > 0 ? "100%" : "-100%" }}
+              animate={{ x: 0 }}
+              exit={{ x: direction > 0 ? "-100%" : "100%" }}
+              transition={{ type: "tween", duration: 0.4, ease: "easeInOut" }}
+              className="absolute inset-0"
+            >
+              <img
+                src={HERO_BANNERS[heroCurrent]}
+                alt={`EaseCare banner ${heroCurrent + 1}`}
+                className="w-full h-full object-contain"
+                draggable={false}
+              />
+            </motion.div>
+          </AnimatePresence>
+
+          {/* Arrows */}
+          <button
+            onClick={heroPrev}
+            aria-label="Previous banner"
+            className="absolute left-2 top-1/2 -translate-y-1/2 z-10 size-8 rounded-full bg-white/80 hover:bg-white flex items-center justify-center shadow opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
+          >
+            <ChevronLeft size={16} className="text-[#374151]" />
+          </button>
+          <button
+            onClick={heroNext}
+            aria-label="Next banner"
+            className="absolute right-2 top-1/2 -translate-y-1/2 z-10 size-8 rounded-full bg-white/80 hover:bg-white flex items-center justify-center shadow opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
+          >
+            <ChevronRight size={16} className="text-[#374151]" />
+          </button>
+        </div>
 
         </div>
       </div>
@@ -144,19 +206,43 @@ export function PromoSection() {
           </p>
         </div>
 
-        {/* Hero pricing panel image — mobile */}
-        <button
-          type="button"
-          onClick={handlePostRequirement}
-          aria-label="Post your requirement — book a verified caregiver"
-          className="relative rounded-[18px] overflow-hidden bg-[#1975D2] w-full cursor-pointer active:scale-[0.99] transition-transform"
-        >
-          <img
-            src="/hero-pricing-panel.webp"
-            alt="Better pricing for every home — Platform fee only 10%"
-            className="w-full h-auto block"
-          />
-        </button>
+        {/* Hero banner carousel — mobile */}
+        <div className="relative rounded-[18px] overflow-hidden bg-[#1975D2] w-full">
+          <AnimatePresence initial={false} custom={direction} mode="popLayout">
+            <motion.div
+              key={`m-${heroCurrent}`}
+              custom={direction}
+              initial={{ x: direction > 0 ? "100%" : "-100%" }}
+              animate={{ x: 0 }}
+              exit={{ x: direction > 0 ? "-100%" : "100%" }}
+              transition={{ type: "tween", duration: 0.4, ease: "easeInOut" }}
+              className="w-full"
+            >
+              <img
+                src={HERO_BANNERS[heroCurrent]}
+                alt={`EaseCare banner ${heroCurrent + 1}`}
+                className="w-full h-auto block"
+                draggable={false}
+              />
+            </motion.div>
+          </AnimatePresence>
+
+          {/* Arrows — always visible on mobile */}
+          <button
+            onClick={heroPrev}
+            aria-label="Previous banner"
+            className="absolute left-2 top-1/2 -translate-y-1/2 z-10 size-7 rounded-full bg-white/80 hover:bg-white flex items-center justify-center shadow cursor-pointer"
+          >
+            <ChevronLeft size={14} className="text-[#374151]" />
+          </button>
+          <button
+            onClick={heroNext}
+            aria-label="Next banner"
+            className="absolute right-2 top-1/2 -translate-y-1/2 z-10 size-7 rounded-full bg-white/80 hover:bg-white flex items-center justify-center shadow cursor-pointer"
+          >
+            <ChevronRight size={14} className="text-[#374151]" />
+          </button>
+        </div>
 
         {/* Service selector card */}
         <div
