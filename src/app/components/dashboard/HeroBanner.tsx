@@ -21,9 +21,10 @@ type Banner = {
 };
 
 const BANNERS: Banner[] = [
-  { key: "banner-1", src: "/banner-1.webp", alt: "EaseCare promotion banner 1" },
-  { key: "banner-2", src: "/banner-2.webp", alt: "EaseCare promotion banner 2" },
-  { key: "banner-3", src: "/banner-3.webp", alt: "EaseCare promotion banner 3" },
+  { key: "banner-1", src: "/Banner 1-Hero.webp", alt: "EaseCare promotion banner 1" },
+  { key: "banner-2", src: "/Banner 2-Hero.webp", alt: "EaseCare promotion banner 2" },
+  { key: "banner-3", src: "/Banner 3-Hero.webp", alt: "EaseCare promotion banner 3" },
+  { key: "banner-4", src: "/Banner 4-Hero.webp", alt: "EaseCare promotion banner 4" },
 ];
 
 const AUTOPLAY_MS = 6000;
