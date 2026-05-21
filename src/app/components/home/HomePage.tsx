@@ -22,20 +22,20 @@ export function HomePage() {
           {/* 3 ── MOST BOOKED SERVICES carousel with Popular/Trending badges */}
           <MostBookedServices />
 
-          {/* 4 ── HOW IT WORKS — 4-step process */}
-          <HowItWorks />
-
-          {/* 5 ── CARE PACKAGES — Bento grid (1 featured + 4 smaller) */}
-          <CarePackages />
-
-          {/* 6 ── TESTIMONIALS — real stories with video thumbnails */}
-          <CommunitySection />
-
-          {/* 8 ── APP DOWNLOAD CTA strip — hidden on mobile
+          {/* 4 ── APP DOWNLOAD CTA strip — hidden on mobile
                  (MobileAppPrompt bottom sheet handles that audience) */}
           <div className="hidden md:block">
             <AppDownloadCTA />
           </div>
+
+          {/* 5 ── HOW IT WORKS — 4-step process */}
+          <HowItWorks />
+
+          {/* 6 ── CARE PACKAGES — Bento grid (1 featured + 4 smaller) */}
+          <CarePackages />
+
+          {/* 7 ── TESTIMONIALS — real stories with video thumbnails */}
+          <CommunitySection />
 
         </div>
       </main>
