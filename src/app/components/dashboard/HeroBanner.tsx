@@ -76,7 +76,8 @@ export function HeroBanner() {
     <div className="flex flex-col gap-3 w-full">
       {/* ── Banner container — height tracks current image naturally ── */}
       <div
-        className="relative w-full rounded-[18px] overflow-hidden select-none group"
+        className="relative w-full rounded-[18px] overflow-hidden select-none group bg-[#f8fafc]"
+        style={{ maxHeight: "clamp(140px, 22vw, 260px)" }}
         onTouchStart={onTouchStart}
         onTouchMove={onTouchMove}
         onTouchEnd={onTouchEnd}
@@ -96,7 +97,8 @@ export function HeroBanner() {
             <img
               src={banner.src}
               alt={banner.alt}
-              className="w-full h-auto block"
+              className="w-full block"
+              style={{ maxHeight: "clamp(140px, 22vw, 260px)", objectFit: "contain" }}
               draggable={false}
             />
           </motion.div>
@@ -119,7 +121,7 @@ export function HeroBanner() {
         </button>
 
         {/* Dot indicators — bottom centre, always visible */}
-        <div className="absolute bottom-3 left-1/2 -translate-x-1/2 z-20 flex items-center gap-1.5">
+        <div className="absolute bottom-2 left-1/2 -translate-x-1/2 z-20 flex items-center gap-1">
           {BANNERS.map((_, i) => (
             <button
               key={i}
@@ -127,8 +129,8 @@ export function HeroBanner() {
               aria-label={`Go to banner ${i + 1}`}
               className={`rounded-full transition-all duration-300 cursor-pointer ${
                 i === current
-                  ? "bg-white w-5 h-1.5"
-                  : "bg-white/50 hover:bg-white/75 w-1.5 h-1.5"
+                  ? "bg-white w-3 h-[3px]"
+                  : "bg-white/50 hover:bg-white/75 w-[5px] h-[3px]"
               }`}
             />
           ))}
