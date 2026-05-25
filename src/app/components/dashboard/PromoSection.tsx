@@ -77,9 +77,9 @@ export function PromoSection() {
   // Opens the Post Requirement modal — ONLY for the "Tell us what you need" link
   const handlePostRequirement = () => requireAuth(() => setPostReqOpen(true));
 
-  // Navigate to services list filtered by category — for category tile clicks
+  // Navigate to services list filtered by category — gated behind auth
   const handleCategoryClick = (label: string) => {
-    navigate(`/services?category=${encodeURIComponent(label)}`);
+    requireAuth(() => navigate(`/services?category=${encodeURIComponent(label)}`));
   };
 
   return (

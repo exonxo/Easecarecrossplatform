@@ -2,6 +2,8 @@ import { useRef } from "react";
 import { useNavigate } from "react-router";
 import { ChevronRight, Star, Flame, TrendingUp, Sparkles } from "lucide-react";
 import { motion } from "motion/react";
+import { useRequireAuth } from "../../hooks/useRequireAuth";
+import { LoginModal } from "../auth/LoginModal";
 
 // ─── Data ─────────────────────────────────────────────────────────────────────
 
@@ -197,12 +199,13 @@ function ServiceCard({
 export function MostBookedServices() {
   const navigate = useNavigate();
   const scrollRef = useRef<HTMLDivElement>(null);
+  const { requireAuth, loginOpen, setLoginOpen } = useRequireAuth();
 
-  // Clicking a service card takes the user to the Services page with the
-  // matching category tab pre-selected — booking happens on that page.
   const handleOpen = (service: (typeof SERVICES)[0]) => {
-    const target = CATEGORY_NAV_MAP[service.category] ?? service.category;
-    navigate(`/services?category=${encodeURIComponent(target)}`);
+    requireAuth(() => {
+      const target = CATEGORY_NAV_MAP[service.category] ?? service.category;
+      navigate(`/services?category=${encodeURIComponent(target)}`);
+    });
   };
 
   const scrollBy = (dir: number) => {
@@ -233,6 +236,8 @@ export function MostBookedServices() {
           </button>
         </div>
       </div>
+
+      <LoginModal open={loginOpen} onOpenChange={setLoginOpen} />
 
       {/* Horizontal scroll row — aligned with page padding (no bleed-to-edge) */}
       <div

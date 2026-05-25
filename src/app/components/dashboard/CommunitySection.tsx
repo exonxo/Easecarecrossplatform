@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { motion } from "motion/react";
 import { Play, Star, Quote } from "lucide-react";
+import { useRequireAuth } from "../../hooks/useRequireAuth";
+import { LoginModal } from "../auth/LoginModal";
 
 // ─── Real customer testimonials with video thumbnails ─────────────────────────
 
@@ -115,6 +117,7 @@ function TestimonialCard({
 
 export function CommunitySection() {
   const [playing, setPlaying] = useState<string | null>(null);
+  const { requireAuth, loginOpen, setLoginOpen } = useRequireAuth();
 
   return (
     <section className="flex flex-col gap-6">
@@ -137,13 +140,15 @@ export function CommunitySection() {
           <div key={t.name} className={i === 0 ? "md:col-span-2" : "md:col-span-1"}>
             <TestimonialCard
               t={t}
-              onPlay={() => setPlaying(t.name)}
+              onPlay={() => requireAuth(() => setPlaying(t.name))}
               index={i}
               featured={i === 0}
             />
           </div>
         ))}
       </div>
+
+      <LoginModal open={loginOpen} onOpenChange={setLoginOpen} />
 
       {/* Simple modal — placeholder for now */}
       {playing && (
