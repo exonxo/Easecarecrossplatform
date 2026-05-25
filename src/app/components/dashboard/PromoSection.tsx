@@ -9,6 +9,7 @@ import { PostRequirementModal } from "./PostRequirementModal";
 // ─── Rotating hero banner images ─────────────────────────────────────────────
 
 const HERO_BANNERS = [
+  "/hero-pricing-panel.webp",
   "/Banner 1-Hero.webp",
   "/Banner 2-Hero.webp",
   "/Banner 3-Hero.webp",
