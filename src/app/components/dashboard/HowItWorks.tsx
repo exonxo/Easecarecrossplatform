@@ -55,7 +55,7 @@ export function HowItWorks() {
 
         {/* Dashed connector line — desktop only, runs through icon centres */}
         <div
-          className="hidden lg:block absolute z-0 top-[28px] left-[12.5%] right-[12.5%] h-px"
+          className="hidden lg:block absolute z-0 top-[42px] left-[12.5%] right-[12.5%] h-px"
           style={{ borderTop: "2px dashed rgba(25,117,210,0.2)" }}
           aria-hidden="true"
         />
@@ -63,8 +63,8 @@ export function HowItWorks() {
         {STEPS.map(({ icon: Icon, number, title, desc, color, bg }, i) => (
           <motion.div
             key={number}
-            initial={{ opacity: 0, y: 14 }}
-            whileInView={{ opacity: 1, y: 0 }}
+            initial={{ opacity: 0, transform: "translateY(14px)" }}
+            whileInView={{ opacity: 1, transform: "translateY(0px)" }}
             viewport={{ once: true, margin: "-40px" }}
             transition={{ delay: i * 0.1, duration: 0.35 }}
             className="relative z-10 bg-white rounded-[18px] p-5 md:p-6 flex flex-col gap-3"

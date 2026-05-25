@@ -49,15 +49,17 @@ function TestimonialCard({
   t,
   onPlay,
   index,
+  featured = false,
 }: {
   t: (typeof TESTIMONIALS)[0];
   onPlay: () => void;
   index: number;
+  featured?: boolean;
 }) {
   return (
     <motion.div
-      initial={{ opacity: 0, y: 16 }}
-      whileInView={{ opacity: 1, y: 0 }}
+      initial={{ opacity: 0, transform: "translateY(16px)" }}
+      whileInView={{ opacity: 1, transform: "translateY(0px)" }}
       viewport={{ once: true, margin: "-50px" }}
       transition={{ delay: index * 0.1, duration: 0.4 }}
       className="bg-white rounded-[20px] overflow-hidden border border-[#eef2f7] flex flex-col h-full"
@@ -66,7 +68,7 @@ function TestimonialCard({
       {/* Video thumbnail */}
       <div
         onClick={onPlay}
-        className="relative h-[200px] overflow-hidden cursor-pointer group bg-[#f1f5f9]"
+        className={`relative overflow-hidden cursor-pointer group bg-[#f1f5f9] ${featured ? "h-[260px]" : "h-[200px]"}`}
       >
         <img
           src={t.thumbnail}
@@ -129,15 +131,17 @@ export function CommunitySection() {
         </p>
       </div>
 
-      {/* Testimonial grid */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-5">
+      {/* Testimonial grid — first card is featured (2 cols wide on desktop) */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 md:gap-5">
         {TESTIMONIALS.map((t, i) => (
-          <TestimonialCard
-            key={t.name}
-            t={t}
-            onPlay={() => setPlaying(t.name)}
-            index={i}
-          />
+          <div key={t.name} className={i === 0 ? "md:col-span-2" : "md:col-span-1"}>
+            <TestimonialCard
+              t={t}
+              onPlay={() => setPlaying(t.name)}
+              index={i}
+              featured={i === 0}
+            />
+          </div>
         ))}
       </div>
 

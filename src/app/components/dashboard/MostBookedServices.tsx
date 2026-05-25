@@ -1,16 +1,17 @@
 import { useRef } from "react";
 import { useNavigate } from "react-router";
-import { ChevronRight, Star } from "lucide-react";
+import { ChevronRight, Star, Flame, TrendingUp, Sparkles } from "lucide-react";
 import { motion } from "motion/react";
 
 // ─── Data ─────────────────────────────────────────────────────────────────────
 
-type Badge = { label: string; bg: string; color: string };
+type BadgeIcon = typeof Flame;
+type Badge = { label: string; bg: string; color: string; Icon: BadgeIcon };
 
-const POPULAR: Badge   = { label: "🔥 Popular",   bg: "#FFEDD5", color: "#C2410C" };
-const TRENDING: Badge  = { label: "📈 Trending",  bg: "#DBEAFE", color: "#1E40AF" };
-const TOP_RATED: Badge = { label: "⭐ Top Rated", bg: "#FEF3C7", color: "#92400E" };
-const NEW_BADGE: Badge = { label: "✨ New",       bg: "#DCFCE7", color: "#15803D" };
+const POPULAR: Badge   = { label: "Popular",  bg: "#FFEDD5", color: "#C2410C", Icon: Flame      };
+const TRENDING: Badge  = { label: "Trending", bg: "#DBEAFE", color: "#1E40AF", Icon: TrendingUp };
+const TOP_RATED: Badge = { label: "Top Rated",bg: "#FEF3C7", color: "#92400E", Icon: Star       };
+const NEW_BADGE: Badge = { label: "New",      bg: "#DCFCE7", color: "#15803D", Icon: Sparkles   };
 
 // Maps the short tag used on each card to the canonical category label used
 // across the rest of the app (categories array in QuickCategories.tsx).
@@ -126,7 +127,8 @@ function ServiceCard({
 }) {
   return (
     <motion.div
-      whileHover={{ y: -3, boxShadow: "0 12px 28px rgba(0,0,0,0.10)" }}
+      whileHover={{ boxShadow: "0 12px 28px rgba(0,0,0,0.10)", transform: "translateY(-3px)" }}
+      whileTap={{ scale: 0.97 }}
       transition={{ type: "spring", stiffness: 400, damping: 28 }}
       onClick={onOpen}
       className="flex flex-col shrink-0 cursor-pointer bg-white rounded-[16px] overflow-hidden"
@@ -141,13 +143,14 @@ function ServiceCard({
         <img
           src={service.image}
           alt={service.name}
-          className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+          className="w-full h-full object-cover"
         />
         {/* Badge — top-left */}
         <span
-          className="absolute top-2.5 left-2.5 font-['Lexend',sans-serif] font-bold text-[10px] tracking-[0.2px] px-2 py-1 rounded-full"
+          className="absolute top-2.5 left-2.5 font-['Lexend',sans-serif] font-bold text-[10px] tracking-[0.2px] px-2 py-1 rounded-full flex items-center gap-1"
           style={{ backgroundColor: service.badge.bg, color: service.badge.color }}
         >
+          <service.badge.Icon size={9} strokeWidth={2.5} />
           {service.badge.label}
         </span>
       </div>

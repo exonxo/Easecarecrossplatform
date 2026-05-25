@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router";
-import { ChevronLeft } from "lucide-react";
+import { ChevronLeft, Package } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import svgPaths from "../../../imports/svg-zdwmi91rdf";
 import { ImageWithFallback } from "../figma/ImageWithFallback";
@@ -224,9 +224,11 @@ function BentoPackageCard({
   const imgHeight = isFeatured ? "h-[260px] md:h-full md:min-h-[300px]" : "h-[140px]";
 
   return (
-    <div
+    <motion.div
       onClick={onTap}
-      className={`group relative rounded-[20px] overflow-hidden cursor-pointer transition-all active:scale-[0.98] flex flex-col h-full ${isFeatured ? "md:flex-row" : ""}`}
+      whileTap={{ scale: 0.97 }}
+      transition={{ type: "spring", stiffness: 400, damping: 28 }}
+      className={`group relative rounded-[20px] overflow-hidden cursor-pointer flex flex-col h-full ${isFeatured ? "md:flex-row" : ""}`}
       style={{
         border: `1.5px solid ${pkg.borderColor}`,
         boxShadow: "0px 2px 8px rgba(15,23,42,0.05)",
@@ -247,7 +249,7 @@ function BentoPackageCard({
           className="absolute top-3 left-3 px-2.5 py-1 rounded-full flex items-center gap-1 backdrop-blur-md"
           style={{ backgroundColor: "rgba(255,255,255,0.95)" }}
         >
-          <span className="text-[10px]">🎁</span>
+          <Package size={10} strokeWidth={2.5} style={{ color: pkg.iconColor }} />
           <span
             className="font-['Lexend',sans-serif] font-extrabold text-[10px] tracking-[0.6px]"
             style={{ color: pkg.iconColor }}
@@ -312,7 +314,7 @@ function BentoPackageCard({
           </button>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 }
 

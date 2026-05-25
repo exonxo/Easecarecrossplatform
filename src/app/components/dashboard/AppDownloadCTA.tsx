@@ -39,8 +39,8 @@ export function AppDownloadCTA() {
 
         {/* LEFT — text + CTAs */}
         <motion.div
-          initial={{ opacity: 0, x: -20 }}
-          whileInView={{ opacity: 1, x: 0 }}
+          initial={{ opacity: 0, transform: "translateX(-20px)" }}
+          whileInView={{ opacity: 1, transform: "translateX(0px)" }}
           viewport={{ once: true }}
           transition={{ duration: 0.5 }}
           className="flex flex-col gap-4 md:py-8"
@@ -70,8 +70,8 @@ export function AppDownloadCTA() {
 
           {/* ⭐ INCENTIVE RIBBON */}
           <motion.div
-            initial={{ opacity: 0, y: 6 }}
-            whileInView={{ opacity: 1, y: 0 }}
+            initial={{ opacity: 0, transform: "translateY(6px)" }}
+            whileInView={{ opacity: 1, transform: "translateY(0px)" }}
             viewport={{ once: true }}
             transition={{ delay: 0.3, duration: 0.4 }}
             className="self-start flex items-center gap-2.5 bg-[#FCD34D] text-[#1f2937] px-4 py-2 rounded-full shadow-[0_4px_14px_rgba(252,211,77,0.45)]"
@@ -108,8 +108,8 @@ export function AppDownloadCTA() {
 
         {/* RIGHT — phone, aligned toward the center-left of the right column */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
+          initial={{ opacity: 0, transform: "translateY(20px)" }}
+          whileInView={{ opacity: 1, transform: "translateY(0px)" }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
           className="relative flex justify-center md:justify-start items-end h-full"

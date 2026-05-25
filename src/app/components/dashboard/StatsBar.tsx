@@ -14,29 +14,24 @@ export function StatsBar() {
       className="rounded-[20px] bg-white border border-[#eef2f7] px-5 md:px-8 py-5 md:py-6"
       style={{ boxShadow: "0px 2px 12px rgba(15,23,42,0.04)" }}
     >
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-2">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-0 md:divide-x md:divide-[#eef2f7]">
         {STATS.map(({ icon: Icon, value, label, color }, i) => (
           <motion.div
             key={label}
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
+            initial={{ opacity: 0, transform: "translateY(8px)" }}
+            animate={{ opacity: 1, transform: "translateY(0px)" }}
             transition={{ delay: i * 0.05, duration: 0.3 }}
-            className="flex items-center gap-3 md:justify-center"
+            className="flex flex-col gap-1 md:items-center md:px-4"
           >
-            <div
-              className="size-10 md:size-11 rounded-full flex items-center justify-center shrink-0"
-              style={{ backgroundColor: `${color}15` }}
-            >
-              <Icon size={18} style={{ color }} strokeWidth={2} />
-            </div>
-            <div className="flex flex-col">
-              <span className="font-['Lexend',sans-serif] font-extrabold text-[18px] md:text-[22px] text-[#0f172a] leading-[1.1]">
-                {value}
-              </span>
+            <div className="flex items-center gap-1.5">
+              <Icon size={14} style={{ color }} strokeWidth={2.5} />
               <span className="font-['Inter',sans-serif] text-[11px] md:text-[12px] text-[#64748b] leading-[14px]">
                 {label}
               </span>
             </div>
+            <span className="font-['Lexend',sans-serif] font-extrabold text-[20px] md:text-[24px] text-[#0f172a] leading-[1.1] tracking-[-0.3px]">
+              {value}
+            </span>
           </motion.div>
         ))}
       </div>
