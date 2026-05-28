@@ -9,7 +9,7 @@ import { EasecareSmallLogo } from "./EasecareSmallLogo";
 import { PrimaryButton } from "../shared/PrimaryButton";
 
 interface LocationScreenProps {
-  onNext: () => void;
+  onNext: (location: string) => void | Promise<void>;
   onBack: () => void;
 }
 
@@ -38,6 +38,7 @@ export function LocationScreen({ onNext, onBack }: LocationScreenProps) {
   const [location, setLocation] = useState("");
   const [usingCurrentLocation, setUsingCurrentLocation] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
 
   const handleUseCurrentLocation = () => {
     setUsingCurrentLocation(true);
@@ -65,7 +66,15 @@ export function LocationScreen({ onNext, onBack }: LocationScreenProps) {
 
   const handleNext = async () => {
     if (!location.trim()) return;
-    onNext();
+    setSaving(true);
+    setError("");
+    try {
+      await onNext(location.trim());
+      // On success the flow navigates home (this screen unmounts).
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Couldn't complete registration. Please try again.");
+      setSaving(false);
+    }
   };
 
   return (
@@ -130,6 +139,11 @@ export function LocationScreen({ onNext, onBack }: LocationScreenProps) {
 
         {/* Footer */}
         <div className="w-full flex flex-col items-center px-6 py-8">
+          {error && (
+            <div className="w-full bg-[#fef2f2] border border-[#fecaca] rounded-[12px] px-4 py-3 mb-2">
+              <p className="font-['Lexend',sans-serif] text-[13px] text-[#dc2626] leading-[18px]">{error}</p>
+            </div>
+          )}
           <div className="w-full pt-6">
             <PrimaryButton
               onClick={handleNext}

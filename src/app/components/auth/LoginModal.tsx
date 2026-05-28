@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from "react";
+import { useNavigate } from "react-router";
 import {
   Dialog,
   DialogContent,
@@ -16,16 +17,17 @@ const GENDER_OPTIONS = ["Male", "Female", "Non-binary", "Prefer not to say"];
 
 // ── Phone Step ────────────────────────────────────────────────────────────────
 
-function PhoneStep({ onNext }: { onNext: (phone: string) => void }) {
+function PhoneStep({ onNext }: { onNext: (phone: string) => void | Promise<void> }) {
   const [phone, setPhone] = useState("");
   const [error, setError] = useState("");
+  const [submitting, setSubmitting] = useState(false);
 
   const formatPhone = (value: string) => {
     const digits = value.replace(/\D/g, "").slice(0, 10);
     return digits.length > 5 ? digits.slice(0, 5) + " " + digits.slice(5) : digits;
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     const digits = phone.replace(/\D/g, "");
     if (digits.length !== 10) {
       setError("Phone number must be 10 digits.");
@@ -35,7 +37,15 @@ function PhoneStep({ onNext }: { onNext: (phone: string) => void }) {
       setError("Enter a valid Indian mobile number (starting with 6–9).");
       return;
     }
-    onNext(digits);
+    setSubmitting(true);
+    setError("");
+    try {
+      await onNext(digits);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Couldn't send OTP. Please try again.");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const isValid = phone.replace(/\D/g, "").length === 10;
@@ -64,7 +74,7 @@ function PhoneStep({ onNext }: { onNext: (phone: string) => void }) {
               setError("");
             }}
             onKeyDown={(e) => {
-              if (e.key === "Enter" && isValid) handleSubmit();
+              if (e.key === "Enter" && isValid && !submitting) handleSubmit();
             }}
             placeholder="98765 43210"
             className="w-full bg-[#f8fafc] border border-[#e2e8f0] rounded-[14px] pl-[90px] pr-4 py-[14px] font-['Lexend',sans-serif] text-[15px] text-[#0f172a] placeholder:text-[#94a3b8] outline-none focus:border-[#1975d2] focus:ring-2 focus:ring-[rgba(25,117,210,0.15)] transition-all"
@@ -81,10 +91,10 @@ function PhoneStep({ onNext }: { onNext: (phone: string) => void }) {
 
       <button
         onClick={handleSubmit}
-        disabled={!isValid}
+        disabled={!isValid || submitting}
         className="w-full bg-[#1975D2] disabled:opacity-40 disabled:cursor-not-allowed text-white font-['Lexend',sans-serif] font-semibold text-[15px] py-3 rounded-[14px] hover:bg-[#1565b8] transition-colors cursor-pointer"
       >
-        Get OTP
+        {submitting ? "Sending…" : "Get OTP"}
       </button>
 
       <p className="text-center font-['Lexend',sans-serif] text-[11px] text-[#94a3b8]">
@@ -105,13 +115,28 @@ function OtpStep({
   onBack,
 }: {
   phone: string;
-  onVerify: () => void;
+  onVerify: (code: string) => void | Promise<void>;
   onBack: () => void;
 }) {
   const [otp, setOtp] = useState<string[]>(Array(OTP_LENGTH).fill(""));
   const [timer, setTimer] = useState(RESEND_COOLDOWN);
   const [canResend, setCanResend] = useState(false);
+  const [error, setError] = useState("");
+  const [verifying, setVerifying] = useState(false);
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
+
+  const handleVerify = async () => {
+    const code = otp.join("");
+    if (code.length !== OTP_LENGTH) return;
+    setVerifying(true);
+    setError("");
+    try {
+      await onVerify(code);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Invalid or expired code. Please try again.");
+      setVerifying(false);
+    }
+  };
 
   useEffect(() => {
     inputRefs.current[0]?.focus();
@@ -223,12 +248,16 @@ function OtpStep({
         )}
       </div>
 
+      {error && (
+        <p className="text-center text-[12px] text-[#dc2626] font-['Lexend',sans-serif]">{error}</p>
+      )}
+
       <button
-        onClick={onVerify}
-        disabled={!isComplete}
+        onClick={handleVerify}
+        disabled={!isComplete || verifying}
         className="w-full bg-[#1975D2] disabled:opacity-40 disabled:cursor-not-allowed text-white font-['Lexend',sans-serif] font-semibold text-[15px] py-3 rounded-[14px] hover:bg-[#1565b8] transition-colors cursor-pointer"
       >
-        Verify & Continue
+        {verifying ? "Verifying…" : "Verify & Continue"}
       </button>
     </div>
   );
@@ -363,28 +392,24 @@ interface LoginModalProps {
 export function LoginModal({ open, onOpenChange }: LoginModalProps) {
   const [step, setStep] = useState<Step>("phone");
   const [phone, setPhone] = useState("");
-  const { login, completeOnboarding, profile } = useAuth();
+  const { sendOtp, verifyOtp, completeOnboarding, profile } = useAuth();
+  const navigate = useNavigate();
 
   const handleClose = useCallback(() => {
     onOpenChange(false);
     setTimeout(() => { setStep("phone"); setPhone(""); }, 300);
   }, [onOpenChange]);
 
-  const handleOtpVerify = useCallback(() => {
-    login(phone);
-    if (phone === SKIP_PHONE) {
+  // Returning seekers log in inline; new users finish in the full /onboarding
+  // flow (which has the policy + registration + location steps).
+  const handleOtpVerify = useCallback(
+    async (code: string) => {
+      const { onboardingComplete } = await verifyOtp(code, phone);
       handleClose();
-    } else {
-      setStep("registration");
-    }
-  }, [phone, login, handleClose]);
-
-  // Returning user: profile restored as complete after login() — skip registration
-  useEffect(() => {
-    if (step === "registration" && profile?.onboardingComplete) {
-      handleClose();
-    }
-  }, [step, profile?.onboardingComplete, handleClose]);
+      if (!onboardingComplete) navigate("/onboarding");
+    },
+    [phone, verifyOtp, handleClose, navigate]
+  );
 
   const handleRegistrationComplete = useCallback(
     (data: { name: string; gender: string; email: string }) => {
@@ -405,7 +430,11 @@ export function LoginModal({ open, onOpenChange }: LoginModalProps) {
 
         {step === "phone" && (
           <PhoneStep
-            onNext={(p) => { setPhone(p); setStep("otp"); }}
+            onNext={async (p) => {
+              await sendOtp(p);
+              setPhone(p);
+              setStep("otp");
+            }}
           />
         )}
         {step === "otp" && (

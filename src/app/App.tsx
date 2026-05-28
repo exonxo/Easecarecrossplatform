@@ -26,6 +26,8 @@ export default function App() {
             <CapacitorShell>
               <RouterProvider router={router} />
               <MobileAppPrompt />
+              {/* Invisible reCAPTCHA host for Firebase Phone Auth (see AuthContext). */}
+              <div id="recaptcha-container" />
             </CapacitorShell>
           </ModalProvider>
         </BookingProvider>

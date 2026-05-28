@@ -24,11 +24,16 @@ import { PhoneEntryScreen } from "./PhoneStep";
 import { OtpVerificationScreen } from "./OtpStep";
 import { FeaturesCarouselScreen } from "./FeaturesStep";
 import { RegistrationScreen } from "./RegistrationStep";
+import { PolicyAcceptanceStep } from "./PolicyAcceptanceStep";
 import { LocationScreen } from "./LocationStep";
 
-type Screen = "phone" | "otp" | "features" | "registration" | "location";
+type Screen = "phone" | "otp" | "features" | "registration" | "policy" | "location";
 
-const SKIP_ONBOARDING_PHONE = "8670803180";
+interface RegData {
+  name: string;
+  email: string;
+  relationship: string;
+}
 
 const variants = {
   enter: (dir: number) => ({
@@ -45,6 +50,8 @@ const variants = {
 export function OnboardingFlow() {
   const [screen, setScreen] = useState<Screen>("phone");
   const [phone, setPhone] = useState("");
+  const [regData, setRegData] = useState<RegData>({ name: "", email: "", relationship: "" });
+  const [policyVersion, setPolicyVersion] = useState("");
   const [direction, setDirection] = useState(1);
   const navigate = useNavigate();
   const auth = useAuth();
@@ -61,32 +68,37 @@ export function OnboardingFlow() {
     setScreen(next);
   }, []);
 
-  /** Called after OTP verification succeeds */
-  const handleOtpVerify = useCallback(() => {
-    // Create session
-    auth.login(phone);
+  /** Called after OTP verification succeeds (throws on bad code → step shows error). */
+  const handleOtpVerify = useCallback(
+    async (code: string) => {
+      const { onboardingComplete } = await auth.verifyOtp(code, phone);
+      if (onboardingComplete) {
+        // Returning seeker — straight to home.
+        navigate("/", { replace: true });
+      } else {
+        // New user — continue onboarding.
+        goTo("features");
+      }
+    },
+    [phone, auth, navigate, goTo],
+  );
 
-    if (phone === SKIP_ONBOARDING_PHONE) {
-      // Known phone — skip to home immediately
+  /** Called when the final location step completes — registers the seeker. */
+  const handleComplete = useCallback(
+    async (location: string) => {
+      await auth.completeOnboarding({ ...regData, location, policyVersion });
       navigate("/", { replace: true });
-    } else {
-      // New user — continue onboarding
-      goTo("features");
-    }
-  }, [phone, auth, navigate, goTo]);
-
-  /** Called when the final location step completes */
-  const handleComplete = useCallback(() => {
-    auth.completeOnboarding();
-    navigate("/", { replace: true });
-  }, [auth, navigate]);
+    },
+    [auth, navigate, regData, policyVersion],
+  );
 
   const renderScreen = () => {
     switch (screen) {
       case "phone":
         return (
           <PhoneEntryScreen
-            onNext={(p) => {
+            onNext={async (p) => {
+              await auth.sendOtp(p);
               setPhone(p);
               goTo("otp");
             }}
@@ -99,6 +111,7 @@ export function OnboardingFlow() {
             onVerify={handleOtpVerify}
             onBack={() => goTo("phone", -1)}
             onChangeNumber={() => goTo("phone", -1)}
+            onResend={() => auth.sendOtp(phone)}
           />
         );
       case "features":
@@ -111,15 +124,28 @@ export function OnboardingFlow() {
       case "registration":
         return (
           <RegistrationScreen
-            onNext={() => goTo("location")}
+            onNext={(data) => {
+              setRegData(data);
+              goTo("policy");
+            }}
             onBack={() => goTo("features", -1)}
+          />
+        );
+      case "policy":
+        return (
+          <PolicyAcceptanceStep
+            onAccept={(version) => {
+              setPolicyVersion(version);
+              goTo("location");
+            }}
+            onBack={() => goTo("registration", -1)}
           />
         );
       case "location":
         return (
           <LocationScreen
             onNext={handleComplete}
-            onBack={() => goTo("registration", -1)}
+            onBack={() => goTo("policy", -1)}
           />
         );
     }

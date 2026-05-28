@@ -82,7 +82,7 @@ function Logo() {
 const RECAPTCHA_BUTTON_ID = "recaptcha-send-otp";
 
 interface PhoneEntryScreenProps {
-  onNext: (phone: string) => void;
+  onNext: (phone: string) => void | Promise<void>;
 }
 
 export function PhoneEntryScreen({ onNext }: PhoneEntryScreenProps) {
@@ -110,7 +110,15 @@ export function PhoneEntryScreen({ onNext }: PhoneEntryScreenProps) {
       return;
     }
 
-    onNext(digits);
+    setLoading(true);
+    setError("");
+    try {
+      await onNext(digits);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Couldn't send OTP. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const isValid = phone.replace(/\D/g, "").length === 10;

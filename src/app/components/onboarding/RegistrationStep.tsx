@@ -9,7 +9,7 @@ import svgPaths from "../../../imports/svg-umiqh991x3";
 import { PrimaryButton } from "../shared/PrimaryButton";
 
 interface RegistrationScreenProps {
-  onNext: () => void;
+  onNext: (data: { name: string; email: string; relationship: string }) => void;
   onBack: () => void;
 }
 
@@ -37,7 +37,7 @@ export function RegistrationScreen({ onNext, onBack }: RegistrationScreenProps) 
 
   const handleRegister = async () => {
     if (!name.trim()) return;
-    onNext();
+    onNext({ name: name.trim(), email: email.trim(), relationship });
   };
 
   return (

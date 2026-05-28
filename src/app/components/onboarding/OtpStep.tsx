@@ -13,9 +13,11 @@ const RESEND_COOLDOWN = 60; // seconds
 
 interface OtpVerificationScreenProps {
   phone: string;
-  onVerify: () => void;
+  onVerify: (code: string) => void | Promise<void>;
   onBack: () => void;
   onChangeNumber: () => void;
+  /** Re-send the OTP (real mode: Firebase). Optional for back-compat. */
+  onResend?: () => void | Promise<void>;
 }
 
 export function OtpVerificationScreen({
@@ -23,6 +25,7 @@ export function OtpVerificationScreen({
   onVerify,
   onBack,
   onChangeNumber,
+  onResend,
 }: OtpVerificationScreenProps) {
   const [otp, setOtp] = useState<string[]>(Array(OTP_LENGTH).fill(""));
   const [timer, setTimer] = useState(RESEND_COOLDOWN);
@@ -83,20 +86,31 @@ export function OtpVerificationScreen({
   const handleResend = async () => {
     setResending(true);
     setError("");
-    setTimeout(() => {
-      setTimer(RESEND_COOLDOWN);
-      setCanResend(false);
-      setOtp(Array(OTP_LENGTH).fill(""));
-      inputRefs.current[0]?.focus();
-      setResending(false);
-    }, 500);
+    try {
+      if (onResend) await onResend();
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Couldn't resend OTP. Please try again.");
+    }
+    setTimer(RESEND_COOLDOWN);
+    setCanResend(false);
+    setOtp(Array(OTP_LENGTH).fill(""));
+    inputRefs.current[0]?.focus();
+    setResending(false);
   };
 
   const handleVerify = async () => {
     const code = otp.join("");
     if (code.length !== OTP_LENGTH) return;
 
-    onVerify();
+    setLoading(true);
+    setError("");
+    try {
+      await onVerify(code);
+      // On success the parent advances/navigates away (this screen unmounts).
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Invalid or expired code. Please try again.");
+      setLoading(false);
+    }
   };
 
   const isComplete = otp.every((d) => d !== "");
