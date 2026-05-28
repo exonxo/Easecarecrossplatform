@@ -154,20 +154,20 @@ export function AddLocationPage() {
       .getAddresses()
       .then((remote) => {
         if (cancelled) return;
-        if (remote.length > 0) {
-          const mapped: SavedAddress[] = remote.map((a) => ({
-            id: a.id,
-            label: a.label,
-            icon: a.icon,
-            address: a.address,
-            coords: a.coords,
-            isDefault: a.isDefault,
-          }));
-          setSavedAddresses(mapped);
-          const def = mapped.find((a) => a.isDefault) || mapped[0];
-          setSelectedAddress(def);
-          if (def) setMapCenter(def.coords);
-        }
+        // Backend is authoritative — reflect the real list (even if empty) rather
+        // than leaving the demo seed in place for a real user with no addresses.
+        const mapped: SavedAddress[] = remote.map((a) => ({
+          id: a.id,
+          label: a.label,
+          icon: a.icon,
+          address: a.address,
+          coords: a.coords,
+          isDefault: a.isDefault,
+        }));
+        setSavedAddresses(mapped);
+        const def = mapped.find((a) => a.isDefault) || mapped[0] || null;
+        setSelectedAddress(def);
+        if (def) setMapCenter(def.coords);
       })
       .catch((err) => logger.error("[AddLocationPage] Failed to load addresses:", err))
       .finally(() => { if (!cancelled) setIsLoading(false); });

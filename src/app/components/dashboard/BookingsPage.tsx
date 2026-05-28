@@ -28,8 +28,6 @@ import {
 } from "./RaiseIssueModal";
 import svgPaths from "../../../imports/svg-zdwmi91rdf";
 import {
-  bookingsApi,
-  requirementsApi,
   isApiReachable,
   type BookingRecord,
   type RequirementRecord,
@@ -1043,8 +1041,8 @@ export function BookingsPage() {
       try {
         const apiUp = isApiReachable();
         const [bks, reqs] = await Promise.all([
-          apiUp ? bookingsApi.getAll().catch(() => [] as BookingRecord[]) : Promise.resolve([] as BookingRecord[]),
-          apiUp ? requirementsApi.getAll().catch(() => [] as RequirementRecord[]) : Promise.resolve([] as RequirementRecord[]),
+          apiUp ? dataService.getBookings().catch(() => [] as BookingRecord[]) : Promise.resolve([] as BookingRecord[]),
+          apiUp ? dataService.getRequirements().catch(() => [] as RequirementRecord[]) : Promise.resolve([] as RequirementRecord[]),
         ]);
 
         let mergedBookings = bks;
@@ -1119,10 +1117,11 @@ export function BookingsPage() {
     verified: true,
   }));
 
-  const allRequests = [...serverRequestCards, ...ACTIVE_REQUESTS].filter(
-    (r, i, arr) => arr.findIndex((x) => x.id === r.id) === i,
-  );
-  const allHistory = [...completedGigCards, ...serverHistoryCards, ...HISTORY_BOOKINGS].filter(
+  // Backend is authoritative — only real requirements/bookings (+ this session's
+  // completed gigs). The hardcoded ACTIVE_REQUESTS / HISTORY_BOOKINGS demo seeds
+  // are intentionally NOT merged so real users don't see fabricated cards.
+  const allRequests = serverRequestCards;
+  const allHistory = [...completedGigCards, ...serverHistoryCards].filter(
     (h, i, arr) => arr.findIndex((x) => x.id === h.id) === i,
   );
 
