@@ -28,7 +28,17 @@ import { ImageWithFallback } from "../figma/ImageWithFallback";
 // import MockApiService from "../../services/MockApiService";
 import { dataService } from "../../services/DataService";
 import { isApiReachable, bookingsApi, transactionsApi, type BookingRecord, type TransactionRecord } from "../../services/api";
+import {
+  createOrder,
+  verifyPayment,
+  openRazorpayCheckout,
+  isRazorpayAvailable,
+  type CreateOrderResult,
+} from "../../services/payments";
 import { ChatModal } from "./ChatModal";
+
+/** Offline/demo mode — simulate payment instead of calling Razorpay. */
+const USE_MOCK = import.meta.env.VITE_USE_MOCK === "true";
 import { PrimaryButton } from "../shared/PrimaryButton";
 import { Confetti } from "../shared/Confetti";
 
@@ -63,6 +73,12 @@ interface PaymentFlowProps {
   onComplete: (bookingId: string) => void;
   /** Start at a specific step. Defaults to "summary". Use "payment" to skip the summary sheet when BookingCheckout is used upstream. */
   startStep?: SheetStep;
+  /** Run AFTER server verify succeeds, BEFORE the success sheet (e.g. bid accept).
+   *  Throwing flips to the failure sheet. */
+  onVerified?: (transactionId: string) => Promise<void>;
+  /** Use this exact total (rupees) instead of recomputing — keeps Razorpay's
+   *  amount aligned with what the checkout summary showed. */
+  totalOverride?: number;
 }
 
 type SheetStep = "summary" | "payment" | "processing" | "confirmed";
@@ -177,9 +193,14 @@ export function PaymentFlow({
   onClose,
   onComplete,
   startStep,
+  onVerified,
+  totalOverride,
 }: PaymentFlowProps) {
   const [step, setStep] = useState<SheetStep>(startStep || "summary");
   const [slideDirection, setSlideDirection] = useState(1); // 1 = forward, -1 = back
+  // Razorpay order cache + post-verify "processing" state (RZ-02).
+  const [orderData, setOrderData] = useState<CreateOrderResult | null>(null);
+  const [verifyPending, setVerifyPending] = useState(false);
 
   // Sheet 1 state
   const [promoCode, setPromoCode] = useState("");
@@ -228,7 +249,7 @@ export function PaymentFlow({
     promoResult?.valid && promoResult.discount
       ? Math.round(serviceCharge * (promoResult.discount / 100))
       : 0;
-  const totalPayable = serviceCharge + platformFee + gst - promoDiscount;
+  const totalPayable = totalOverride ?? (serviceCharge + platformFee + gst - promoDiscount);
   const walletBalance = 240;
 
   // Reset state when opened
@@ -250,6 +271,8 @@ export function PaymentFlow({
       setPaymentFailed(false);
       setTransactionId("");
       setCopied(false);
+      setOrderData(null);
+      setVerifyPending(false);
     }
   }, [open, startStep]);
 
@@ -305,6 +328,70 @@ export function PaymentFlow({
     goForward("processing");
     setPaymentFailed(false);
 
+    // ── REAL: create-order → Razorpay → server verify (backend owns the booking) ──
+    if (!USE_MOCK) {
+      try {
+        let order = orderData;
+        if (order?.expire_by && Date.now() / 1000 > order.expire_by) order = null;
+        if (!order) {
+          order = await createOrder({ booking_id: bookingId, amount: totalPayable });
+          setOrderData(order);
+        }
+        const opened = openRazorpayCheckout({
+          keyId: order.key_id,
+          amount: order.amount,
+          currency: order.currency,
+          orderId: order.order_id,
+          description: `${provider.service}${provider.name ? ` — ${provider.name}` : ""}`,
+          onSuccess: async (resp) => {
+            try {
+              const v = await verifyPayment({
+                razorpay_order_id: resp.razorpay_order_id,
+                razorpay_payment_id: resp.razorpay_payment_id,
+                razorpay_signature: resp.razorpay_signature,
+              });
+              if (!v.verified) {
+                setPaymentFailed(true);
+                return;
+              }
+              const txn = v.transaction_id || resp.razorpay_payment_id;
+              setTransactionId(txn);
+              setOrderData(null);
+              // Post-verify work (e.g. bid accept) runs BEFORE the success sheet.
+              if (onVerified) {
+                try {
+                  await onVerified(txn);
+                } catch (e) {
+                  logger.error("[PaymentFlow] onVerified failed", e);
+                  setPaymentFailed(true);
+                  return;
+                }
+              }
+              goForward("confirmed");
+            } catch {
+              // RZ-02: verify network error — payment likely captured; the webhook
+              // reconciles. Show confirmed-as-processing, never a hard failure.
+              setTransactionId(resp.razorpay_payment_id || "");
+              setVerifyPending(true);
+              setOrderData(null);
+              goForward("confirmed");
+            }
+          },
+          onDismiss: () => goBack("payment"),
+          onFailed: () => setPaymentFailed(true),
+        });
+        if (!opened) {
+          logger.error("[PaymentFlow] Razorpay unavailable (key_id empty or SDK not loaded)");
+          setPaymentFailed(true);
+        }
+      } catch (e) {
+        logger.error("[PaymentFlow] createOrder failed", e);
+        setPaymentFailed(true);
+      }
+      return;
+    }
+
+    // ── MOCK / offline demo: simulate success + local persist (legacy) ──
     // Generate a local transaction ID for fallback / offline-first use
     const localTxnId = `TXN${Date.now().toString(36).toUpperCase()}${Math.random().toString(36).slice(2, 6).toUpperCase()}`;
 
@@ -423,7 +510,7 @@ export function PaymentFlow({
     } else {
       setPaymentFailed(true);
     }
-  }, [selectedMethod, upiId, cardNumber, bookingId, provider, booking, totalPayable, goForward]);
+  }, [selectedMethod, upiId, cardNumber, bookingId, provider, booking, totalPayable, goForward, goBack, orderData, onVerified]);
 
   // ── Receipt download ──
   const handleDownloadReceipt = async () => {
@@ -1168,6 +1255,14 @@ export function PaymentFlow({
               {provider.name} will arrive at your home on{" "}
               {booking.startDate} at {booking.startTime}
             </p>
+
+            {verifyPending && (
+              <div className="mt-3 bg-[#FFFBEB] border border-[#FDE68A] rounded-[10px] px-3 py-2 max-w-[320px]">
+                <p className="font-['Inter',sans-serif] text-[12px] text-[#92400E] leading-[18px] text-center">
+                  Payment received — we're confirming it now. Your booking will update shortly.
+                </p>
+              </div>
+            )}
 
             {/* Booking ID chip */}
             <button

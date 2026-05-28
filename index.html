@@ -44,6 +44,9 @@
   </head>
   <body>
     <div id="root"></div>
+    <!-- Razorpay Checkout SDK — loaded at app level so window.Razorpay is always
+         available without per-component race conditions (matches ease-care-ui-design). -->
+    <script async src="https://checkout.razorpay.com/v1/checkout.js"></script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
