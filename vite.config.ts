@@ -45,6 +45,19 @@ export default defineConfig({
     },
   },
 
+  // Local dev only: proxy same-origin /api → a local backend so the app can run with
+  // VITE_API_BASE_URL=/api/v1 (matching the production same-origin LB at web.ease-care.app).
+  // Override the target via VITE_DEV_API_TARGET if the backend runs elsewhere.
+  server: {
+    port: 5175,
+    proxy: {
+      '/api': {
+        target: process.env.VITE_DEV_API_TARGET || 'http://localhost:8000',
+        changeOrigin: true,
+      },
+    },
+  },
+
   // File types to support raw imports. Never add .css, .tsx, or .ts files to this.
   assetsInclude: ['**/*.svg', '**/*.csv'],
 })

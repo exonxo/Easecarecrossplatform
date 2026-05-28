@@ -19,6 +19,7 @@ import {
   type AddressRecord,
   type IssueRecord,
 } from "./api";
+import { ApiDataService } from "./ApiDataService";
 
 // ─── DataService Interface ───
 
@@ -127,7 +128,13 @@ class LocalDataService implements IDataService {
 }
 
 // ─── Active Service ───
-export const dataService: IDataService = new LocalDataService();
+// Default = real backend (ApiDataService). Set VITE_USE_MOCK="true" for an
+// offline/local demo backed by localStorage (LocalDataService).
+const USE_MOCK = import.meta.env.VITE_USE_MOCK === "true";
+
+export const dataService: IDataService = USE_MOCK
+  ? new LocalDataService()
+  : new ApiDataService();
 
 // Re-export types for convenience
 export type {

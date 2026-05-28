@@ -34,59 +34,22 @@ export function warmUp(): Promise<void> {
 }
 
 // ─── Types ───
-export interface BookingRecord {
-  bookingId: string;
-  providerName: string;
-  providerPhoto: string;
-  service: string;
-  rating: number;
-  agency: string;
-  verified: boolean;
-  serviceType: string;
-  startDate: string;
-  startTime: string;
-  duration: string;
-  durationDays: number;
-  location: string;
-  dailyRate: number;
-  totalPaid: number;
-  paymentMethod: string;
-  transactionId: string;
-  status: "confirmed" | "ongoing" | "completed" | "cancelled";
-  createdAt?: string;
-}
-
-export interface RequirementRecord {
-  reqId: string;
-  service: string;
-  careFor: string;
-  duration: string;
-  budget: string;
-  language: string;
-  status: "active" | "pending" | "expired";
-  createdAt?: string;
-}
-
-export interface TransactionRecord {
-  transactionId: string;
-  bookingId: string;
-  amount: number;
-  paymentMethod: string;
-  status: "success" | "failed" | "refunded";
-  providerName: string;
-  service: string;
-  createdAt?: string;
-}
-
-export interface AddressRecord {
-  id: string;
-  label: string;
-  icon: "home" | "work" | "favorite" | "other";
-  address: string;
-  coords: [number, number];
-  isDefault?: boolean;
-  createdAt?: string;
-}
+// Canonical definitions live in ./types (the Pydantic↔TS contract). Re-exported
+// here so existing importers (DataService.ts and components) keep working.
+export type {
+  BookingRecord,
+  RequirementRecord,
+  TransactionRecord,
+  AddressRecord,
+  IssueRecord,
+} from "./types";
+import type {
+  BookingRecord,
+  RequirementRecord,
+  TransactionRecord,
+  AddressRecord,
+  IssueRecord,
+} from "./types";
 
 // ─── localStorage keys ───
 const KEYS = {
@@ -262,18 +225,6 @@ export const receiptsApi = {
 };
 
 // ─── Issues / Support Tickets ───
-export interface IssueRecord {
-  id?: string;
-  bookingId: string;
-  category: string;
-  priority: string;
-  description: string;
-  evidenceUrls?: string[];
-  providerName?: string;
-  status?: string;
-  createdAt?: string;
-}
-
 export const issuesApi = {
   async getAll(): Promise<IssueRecord[]> {
     return lsGet<IssueRecord[]>(KEYS.issues, []);
